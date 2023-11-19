@@ -58,7 +58,7 @@ public Q_SLOTS: // METHODS
     {
         QList<QVariant> argumentList;
         QDBusMessage reply = callWithArgumentList(QDBus::Block, QLatin1String("GetServerInformation"), argumentList);
-        if (reply.type() == QDBusMessage::ReplyMessage && reply.arguments().count() == 4) {
+        if (reply.metaType().id() == QDBusMessage::ReplyMessage && reply.arguments().count() == 4) {
             return_vendor = qdbus_cast<QString>(reply.arguments().at(1));
             return_version = qdbus_cast<QString>(reply.arguments().at(2));
             return_spec_version = qdbus_cast<QString>(reply.arguments().at(3));

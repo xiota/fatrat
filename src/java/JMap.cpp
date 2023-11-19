@@ -53,7 +53,7 @@ void JMap::put(JObject key, JObject value)
 
 JObject JMap::nativeToBoxed(QVariant var)
 {
-	switch (var.type())
+	switch (var.metaType().id())
 	{
 	case QVariant::Bool:
 		return nativeToBoxed(var.toBool());

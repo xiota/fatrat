@@ -61,17 +61,17 @@ static void checkArguments(const QList<QVariant>& args, const QVariant::Type* ty
 		throw XmlRpcService::XmlRpcError(2, QString("Invalid argument count - received %1, expected %2").arg(args.size()).arg(ntypes));
 	for(int i=0;i<ntypes;i++)
 	{
-		if(args[i].type() != types[i] && !args[i].canConvert(types[i]))
-			throw XmlRpcService::XmlRpcError(3, QString("Invalid argument type - #%1, received %2, expected %3").arg(i).arg(args[i].type()).arg(types[i]));
+		if(args[i].metaType().id() != types[i] && !args[i].canConvert(types[i]))
+			throw XmlRpcService::XmlRpcError(3, QString("Invalid argument type - #%1, received %2, expected %3").arg(i).arg(args[i].metaType().id()).arg(types[i]));
 	}
 }
 
 static void checkType(QVariant var, QVariant::Type type)
 {
-	if(var.type() != type)
+	if(var.metaType().id() != type)
 	{
 		throw XmlRpcService::XmlRpcError(4, QString("Invalid subargument type - %1 instead of %2")
-						 .arg(var.type()).arg(type));
+						 .arg(var.metaType().id()).arg(type));
 	}
 }
 

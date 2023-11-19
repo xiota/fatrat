@@ -196,7 +196,7 @@ JValue JClass::variantToValue(QVariant& v)
 {
 	//JScope s;
 
-	switch (v.type())
+	switch (v.metaType().id())
 	{
 	case QVariant::Int:
 	case QVariant::UInt:
@@ -311,7 +311,7 @@ void JClass::setStaticValue(const char* name, const char* sig, QVariant value)
 	case '[':
 	case 'L':
 		{
-			if (value.type() == QVariant::String)
+			if (value.metaType().id() == QVariant::String)
 			{
 				JString js(value.toString());
 				env->SetStaticObjectField(m_class, fid, js);
