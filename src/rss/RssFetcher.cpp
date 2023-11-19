@@ -366,9 +366,9 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match,
         matcher2("(\\d\\d)[\\-\\. ](\\d\\d)[\\-\\. ](\\d{2,4})"),
         matcher3("(\\d\\d?)[\\-\\. ](\\w{3,})[\\-\\. ](\\d{2,4})");
 
-    QRegularExpression matched1 = matcher1.match(itemName);
-    QRegularExpression matched2 = matcher2.match(itemName);
-    QRegularExpression matched3 = matcher3.match(itemName);
+    QRegularExpressionMatch matched1 = matcher1.match(itemName);
+    QRegularExpressionMatch matched2 = matcher2.match(itemName);
+    QRegularExpressionMatch matched3 = matcher3.match(itemName);
 
     if (matched1.hasMatch()) {
       int month = matched1.captured(2).toInt(), day = matched1.captured(3).toInt();
