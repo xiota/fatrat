@@ -219,7 +219,7 @@ void RssFetcher::processItem(QList<RssRegexp>& regexps, const RssItem& item)
 
 			QStringList urls;
 
-			if(!regexps[i].linkRegexp.isEmpty())
+			if(!regexps[i].linkRegexp.pattern().isEmpty())
 			{
 				int index = 0;
 				QRegularExpressionMatch match = regexps[i].linkRegexp.match(item.descr, index);

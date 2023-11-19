@@ -181,7 +181,7 @@ int RssRegexpDlg::exec()
 	checkTVSNoManuals->setChecked(m_regexp.excludeManuals);
 	checkAddPaused->setChecked(m_regexp.addPaused);
 
-	if(!m_regexp.linkRegexp.isEmpty())
+	if(!m_regexp.linkRegexp.pattern().isEmpty())
 	{
 		radioParsingExtract->setChecked(true);
 		lineParsingRegexp->setText(m_regexp.linkRegexp.pattern());
