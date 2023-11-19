@@ -264,7 +264,7 @@ void UrlClient::processContentDisposition(const QByteArray& con)
 	{
 		QString name = con.mid(pos+9);
 		
-		QRegExp quoted("\"([^\"]+)\".*");
+		QRegularExpression quoted("\"([^\"]+)\".*");
 		if(quoted.exactMatch(name))
 			name = quoted.cap(1);
 		

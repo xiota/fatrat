@@ -1025,7 +1025,7 @@ show_dialog:
 		if(!sep)
 			uris = m_dlgNewTransfer->m_strURIs.split('\n', Qt::SkipEmptyParts);
 		else
-			uris = m_dlgNewTransfer->m_strURIs.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+			uris = m_dlgNewTransfer->m_strURIs.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
 		
 		if(uris.isEmpty())
 			throw RuntimeException();

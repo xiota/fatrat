@@ -41,7 +41,7 @@ respects for all of the code used other than "OpenSSL".
 #include <QNetworkAccessManager>
 #include <QUrl>
 #include <QMap>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextDocument>
 #include <QDesktopServices>
 #include <QHeaderView>
@@ -318,7 +318,7 @@ void TorrentSearch::parseResults(Engine* e, const QByteArray& data)
 			
 			for(QMap<QString,RegExpParam>::iterator it = e->regexps.begin(); it != e->regexps.end(); it++)
 			{
-				QRegExp re(it.value().regexp);
+				QRegularExpression re(it.value().regexp);
 				int pos = 0;
 				
 				for(int k=0;k<it.value().match+1;k++)

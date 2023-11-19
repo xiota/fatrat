@@ -331,7 +331,7 @@ void JavaDownload::globalInit()
 
 				JObject cfgDlg = obj.getAnnotation(annConfigDialog);
 
-				JavaEngine e = { "EXT - " + name.toStdString(), clsName.toStdString(), QRegExp(regexp) };
+				JavaEngine e = { "EXT - " + name.toStdString(), clsName.toStdString(), QRegularExpression(regexp) };
 				e.forceSingleTransfer = ann.call("forceSingleTransfer", JSignature().retBoolean()).toBool();
 				e.truncate = ann.call("truncIncomplete", JSignature().retBoolean()).toBool();
 

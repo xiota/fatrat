@@ -283,7 +283,7 @@ void RssFetcher::loadRegexps(QList<RssRegexp>& items)
 		RssRegexp item;
 		g_settings->setArrayIndex(i);
 		
-		item.regexp = QRegExp(g_settings->value("regexp").toString(), Qt::CaseInsensitive);
+		item.regexp = QRegularExpression(g_settings->value("regexp").toString(), Qt::CaseInsensitive);
 		item.queueUUID = g_settings->value("queueUUID").toString();
 		item.source = g_settings->value("source").toString();
 		item.target = g_settings->value("target").toString();
@@ -296,7 +296,7 @@ void RssFetcher::loadRegexps(QList<RssRegexp>& items)
 		item.excludeManuals = g_settings->value("excludeManuals").toBool();
 		item.queueIndex = -1;
 		item.addPaused = g_settings->value("addPaused").toBool();
-		item.linkRegexp = QRegExp(g_settings->value("linkRegexp").toString(), Qt::CaseInsensitive);
+		item.linkRegexp = QRegularExpression(g_settings->value("linkRegexp").toString(), Qt::CaseInsensitive);
 		
 		items << item;
 	}
@@ -380,7 +380,7 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match, QString itemName
 		return QString();
 	else if(match.tvs == RssRegexp::SeasonBased)
 	{
-		QRegExp matcher1("(\\d+)x(\\d+)"), matcher2("S(\\d+)E(\\d+)");
+		QRegularExpression matcher1("(\\d+)x(\\d+)"), matcher2("S(\\d+)E(\\d+)");
 		if(matcher1.indexIn(itemName) != -1)
 			rval = QString("S%1E%2").arg(matcher1.cap(1).toInt(),2,10,zero).arg(matcher1.cap(2).toInt(),2,10,zero);
 		else if(matcher2.indexIn(itemName) != -1)
@@ -388,13 +388,13 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match, QString itemName
 	}
 	else if(match.tvs == RssRegexp::EpisodeBased)
 	{
-		QRegExp matcher("\\d+");
+		QRegularExpression matcher("\\d+");
 		if(matcher.indexIn(itemName) != -1)
 			rval = QString("%1").arg( matcher.cap(1).toInt(), 4, 10, zero );
 	}
 	else if(match.tvs == RssRegexp::DateBased)
 	{
-		QRegExp matcher1("(\\d{4})[\\-\\. ](\\d\\d)[\\-\\. ](\\d\\d)"), matcher2("(\\d\\d)[\\-\\. ](\\d\\d)[\\-\\. ](\\d{2,4})"),
+		QRegularExpression matcher1("(\\d{4})[\\-\\. ](\\d\\d)[\\-\\. ](\\d\\d)"), matcher2("(\\d\\d)[\\-\\. ](\\d\\d)[\\-\\. ](\\d{2,4})"),
 				 matcher3("(\\d\\d?)[\\-\\. ](\\w{3,})[\\-\\. ](\\d{2,4})");
 		if(matcher1.indexIn(itemName) != -1)
 		{

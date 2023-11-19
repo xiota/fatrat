@@ -27,7 +27,7 @@ respects for all of the code used other than "OpenSSL".
 #include "HttpMirrorsDlg.h"
 #include <QUrl>
 #include <QProcess>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QtDebug>
 #include <climits>
 
@@ -108,8 +108,8 @@ HttpMirrorsDlg::ProbeThread::~ProbeThread()
 
 void HttpMirrorsDlg::ProbeThread::run()
 {
-	QRegExp reTime("time=([0-9\\.]+) ms");
-	QRegExp reTtl("ttl=(\\d+)");
+	QRegularExpression reTime("time=([0-9\\.]+) ms");
+	QRegularExpression reTtl("ttl=(\\d+)");
 
 	for (QMap<QString,QTreeWidgetItem*>::iterator it = m_servers.begin(); it != m_servers.end(); it++)
 	{

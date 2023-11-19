@@ -74,7 +74,7 @@ void CurlUpload::init(QString source, QString target)
 		QList<Auth> auths = Auth::loadAuths();
 		foreach(Auth a,auths)
 		{
-			if(!QRegExp(a.strRegExp).exactMatch(target))
+			if(!QRegularExpression(a.strRegExp).exactMatch(target))
 				continue;
 			
 			m_strTarget.setUserName(a.strUser);

@@ -89,7 +89,7 @@ respects for all of the code used other than "OpenSSL".
 libtorrent::session* TorrentDownload::m_session = 0;
 TorrentWorker* TorrentDownload::m_worker = 0;
 bool TorrentDownload::m_bDHT = false;
-QList<QRegExp> TorrentDownload::m_listBTLinks;
+QList<QRegularExpression> TorrentDownload::m_listBTLinks;
 QLabel* TorrentDownload::m_labelDHTStats = 0;
 QMutex TorrentDownload::m_mutexAlerts;
 
@@ -156,7 +156,7 @@ void TorrentDownload::fillSettings(libtorrent::settings_pack& settings)
 {
 	QString ua = getSettingsValue("torrent/ua").toString();
 	short s1 = 0, s2 = 0, s3 = 0, s4 = 0;
-	QRegExp reVersion("(\\d)\\.(\\d)\\.(\\d)\\.?(\\d)?");
+	QRegularExpression reVersion("(\\d)\\.(\\d)\\.(\\d)\\.?(\\d)?");
 
 	if(reVersion.indexIn(ua) != -1)
 	{
@@ -309,7 +309,7 @@ void TorrentDownload::globalInit()
 			QByteArray line = file.readLine().trimmed();
 			if(line.isEmpty())
 				continue;
-			m_listBTLinks << QRegExp(line);
+			m_listBTLinks << QRegularExpression(line);
 		}
 	}
 	

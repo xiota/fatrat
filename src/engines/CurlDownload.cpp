@@ -97,7 +97,7 @@ void CurlDownload::init(QString uri, QString dest)
 		QList<Auth> auths = Auth::loadAuths();
 		foreach(Auth a,auths)
 		{
-			if(!QRegExp(a.strRegExp).exactMatch(uri))
+			if(!QRegularExpression(a.strRegExp).exactMatch(uri))
 				continue;
 			
 			obj.url.setUserName(a.strUser);

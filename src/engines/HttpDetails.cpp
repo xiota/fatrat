@@ -445,7 +445,7 @@ QMap<QString,QStringList> HttpDetails::loadMirrors()
 		return rv;
 	QString nextGrp;
 	QStringList list;
-	QRegExp re("\\[([^\\]]+)\\]");
+	QRegularExpression re("\\[([^\\]]+)\\]");
 
 	while (!file.atEnd())
 	{

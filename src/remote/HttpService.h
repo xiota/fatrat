@@ -36,7 +36,7 @@ respects for all of the code used other than "OpenSSL".
 #include <QList>
 #include <QQueue>
 #include <QTimer>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <ctime>
 #include <functional>
 #include <memory>
@@ -88,7 +88,7 @@ private:
 	void killCaptchaClients();
 
 	typedef std::function<HTTPRequestHandler*()> handler_t;
-	void addHandler(const QRegExp& path, handler_t handler) { m_handlers << QPair<QRegExp, handler_t>(path, handler); }
+	void addHandler(const QRegularExpression& path, handler_t handler) { m_handlers << QPair<QRegularExpression, handler_t>(path, handler); }
 
 	void logService(HTTPServerRequest &req, HTTPServerResponse &resp);
 private:
@@ -105,7 +105,7 @@ private:
 	HTTPServer* m_server;
 	std::unique_ptr<ServerSocket> m_socket;
 
-	QList<QPair<QRegExp, handler_t>> m_handlers;
+	QList<QPair<QRegularExpression, handler_t>> m_handlers;
 	QMutex m_handlersMutex;
 	XmlRpcService m_xmlRpc;
 

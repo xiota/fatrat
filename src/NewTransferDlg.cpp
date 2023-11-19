@@ -316,9 +316,9 @@ void NewTransferDlg::textChanged()
 	QStringList list;
 	
 	if(radioDownload->isChecked())
-		list = textURIs->toPlainText().split(QRegExp('\n'), QString::SkipEmptyParts);
+		list = textURIs->toPlainText().split(QRegularExpression('\n'), QString::SkipEmptyParts);
 	else
-		list = textFiles->toPlainText().split(QRegExp('\n'), QString::SkipEmptyParts);
+		list = textFiles->toPlainText().split(QRegularExpression('\n'), QString::SkipEmptyParts);
 	checkDetails->setEnabled(list.size() <= 1);
 }
 */

@@ -50,11 +50,11 @@ void ClipboardMonitor::reloadSettings()
 	m_bEnabledGlobal = getSettingsValue("clipboard/monitorglobal").toBool();
 	m_bEnabledSelection = getSettingsValue("clipboard/monitorselection").toBool();
 	QStringList r = getSettingsValue("clipboard/regexps").toStringList();
-	QList<QRegExp> nr;
+	QList<QRegularExpression> nr;
 
 	foreach (const QString& s, r)
 	{
-		nr << QRegExp(s);
+		nr << QRegularExpression(s);
 	}
 	m_regexps = nr;
 }
@@ -71,7 +71,7 @@ void ClipboardMonitor::dataChanged(QClipboard::Mode mode)
 
 	QStringList links;
 
-	foreach (const QRegExp& re, m_regexps)
+	foreach (const QRegularExpression& re, m_regexps)
 	{
 		int pos = 0, start = links.size();
 

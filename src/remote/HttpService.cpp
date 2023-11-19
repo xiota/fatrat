@@ -92,14 +92,14 @@ HttpService::HttpService()
 	
 	addSettingsPage(si);
 
-	addHandler(QRegExp("/xmlrpc"), std::bind(&XmlRpcService::createHandler, &m_xmlRpc));
-	addHandler(QRegExp("/log.*"), []() { return new LogService(QLatin1String("/log")); });
-	addHandler(QRegExp("/subclass.*"), []() { return new SubclassService(QLatin1String("/subclass")); });
-	addHandler(QRegExp("/browse.*"), []() { return new TransferTreeBrowserService(QLatin1String("/browse")); });
-	addHandler(QRegExp("/download"), []() { return new TransferDownloadService(QLatin1String("/download")); });
-	addHandler(QRegExp("/copyrights"), []() { return new FileRequestHandler("/copyrights", DATA_LOCATION "/README"); });
-	addHandler(QRegExp("/captcha"), []() { return new CaptchaService; });
-	addHandler(QRegExp("/websocket"), []() { return new WebSocketService; });
+	addHandler(QRegularExpression("/xmlrpc"), std::bind(&XmlRpcService::createHandler, &m_xmlRpc));
+	addHandler(QRegularExpression("/log.*"), []() { return new LogService(QLatin1String("/log")); });
+	addHandler(QRegularExpression("/subclass.*"), []() { return new SubclassService(QLatin1String("/subclass")); });
+	addHandler(QRegularExpression("/browse.*"), []() { return new TransferTreeBrowserService(QLatin1String("/browse")); });
+	addHandler(QRegularExpression("/download"), []() { return new TransferDownloadService(QLatin1String("/download")); });
+	addHandler(QRegularExpression("/copyrights"), []() { return new FileRequestHandler("/copyrights", DATA_LOCATION "/README"); });
+	addHandler(QRegularExpression("/captcha"), []() { return new CaptchaService; });
+	addHandler(QRegularExpression("/websocket"), []() { return new WebSocketService; });
 
 	XmlRpcService::registerFunction("HttpService.generateCertificate", generateCertificate, QVector<QVariant::Type>() << QVariant::String);
 
@@ -250,7 +250,7 @@ HTTPRequestHandler* HttpService::createRequestHandler(const HTTPServerRequest& r
 
 	m_handlersMutex.lock();
 
-	for (const QPair<QRegExp, handler_t>& e : m_handlers)
+	for (const QPair<QRegularExpression, handler_t>& e : m_handlers)
 	{
 		if (e.first.exactMatch(uri))
 		{
