@@ -35,6 +35,7 @@ respects for all of the code used other than "OpenSSL".
 #include <QUrl>
 #include <QXmlSimpleReader>
 #include <QtDebug>
+#include <QRegularExpression>
 
 #include "Logger.h"
 #include "Queue.h"
