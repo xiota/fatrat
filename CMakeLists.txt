@@ -91,14 +91,14 @@ if(WITH_BITTORRENT)
 	find_package(Qt6 REQUIRED COMPONENTS WebEngineCore)
 	find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets)
 
-	if (Qt6WebEngine_FOUND)
+	if (Qt6WebEngineCore_FOUND)
 		set(HAVE_WEBENGINE TRUE)
 		set(QT_LIBRARIES ${QT_LIBRAIRES} Qt6::WebEngineCore Qt6::WebEngineWidgets)
-	else(Qt6WebEngine_FOUND)
+	else(Qt6WebEngineCore_FOUND)
 		message(WARNING "Qt WebEngineCore not found, BitTorrent search not available")
-	endif (Qt6WebEngine_FOUND)
+	endif (Qt6WebEngineCore_FOUND)
 
-	include_directories(${Qt6WebEngine_INCLUDE_DIRS})
+	include_directories(${Qt6WebEngineCore_INCLUDE_DIRS})
 	ADD_DEFINITIONS(-DTORRENT_USE_OPENSSL)
 endif(WITH_BITTORRENT)
 
