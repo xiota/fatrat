@@ -96,7 +96,7 @@ void Scheduler::saveActions(const QList<ScheduledAction>& items)
 			days[i] = a.daysRepeated[i] ? '1' : '0';
 		days[7] = 0;
 
-		g_settings->setValue("daysRepeated", days);
+		g_settings->setValue("daysRepeated", QString::fromUtf8(days));
 	}
 
 	g_settings->endArray();
