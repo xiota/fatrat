@@ -249,7 +249,7 @@ void UrlClient::processContentDisposition(const QByteArray& con) {
 
     QRegularExpression quoted("\"([^\"]+)\".*");
 
-    QRegularExpressionMatch = quoted.match(name);
+    QRegularExpressionMatch match = quoted.match(name);
     if (match.hasMatch())
       name = match.captured(1);
 
