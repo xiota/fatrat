@@ -253,8 +253,9 @@ void RssFetcher::loadRegexps(QList<RssRegexp>& items) {
     RssRegexp item;
     g_settings->setArrayIndex(i);
 
-    item.regexp = QRegularExpression(g_settings->value("regexp").toString(),
-                                     Qt::CaseInsensitive);
+    item.regexp = QRegularExpression(g_settings->value("regexp").toString());
+    item.regexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+
     item.queueUUID = g_settings->value("queueUUID").toString();
     item.source = g_settings->value("source").toString();
     item.target = g_settings->value("target").toString();
@@ -267,8 +268,11 @@ void RssFetcher::loadRegexps(QList<RssRegexp>& items) {
     item.excludeManuals = g_settings->value("excludeManuals").toBool();
     item.queueIndex = -1;
     item.addPaused = g_settings->value("addPaused").toBool();
+
     item.linkRegexp = QRegularExpression(
-        g_settings->value("linkRegexp").toString(), Qt::CaseInsensitive);
+        g_settings->value("linkRegexp").toString());
+    item.linkRegexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+
 
     items << item;
   }
