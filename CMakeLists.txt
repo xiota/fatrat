@@ -95,7 +95,7 @@ if(WITH_BITTORRENT)
 	#endif(ASIO_FOUND)
 
 	find_package(Qt6 REQUIRED COMPONENTS WebEngineCore)
-	find_package(Qt6 REQUIRED COMPONENTS Qt6WebEngineWidgets)
+	find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets)
 
 	if (Qt6WebEngine_FOUND)
 		set(HAVE_WEBENGINE TRUE)
