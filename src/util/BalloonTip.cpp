@@ -12,7 +12,6 @@
 #include <QBitmap>
 #include <QPainter>
 #include <QPainterPath>
-#include <QDesktopWidget>
 #include <QApplication>
 
 BalloonTip::BalloonTip(QWidget* parent, QIcon si, const QString& title, const QString& message)

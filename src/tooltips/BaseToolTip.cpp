@@ -26,7 +26,6 @@ respects for all of the code used other than "OpenSSL".
 
 #include "BaseToolTip.h"
 #include <QApplication>
-#include <QDesktopWidget>
 
 BaseToolTip::BaseToolTip(QObject* master, QWidget* parent)
 	: QLabel(parent)
