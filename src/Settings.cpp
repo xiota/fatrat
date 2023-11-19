@@ -50,39 +50,39 @@ static QSettings* m_settingsDefaults = 0;
 void initSettingsPages()
 {
 	SettingsItem si;
-	
+
 	si.icon = DelayedIcon(":/fatrat/fatrat.png");
 	si.title = QObject::tr("Main");
 	si.lpfnCreate = SettingsGeneralForm::create;
 	si.pfnApply = SettingsGeneralForm::applySettings;
-	
+
 	g_settingsPages << si;
-	
+
 	si.icon = DelayedIcon(":/fatrat/queue.png");
 	si.title = QObject::tr("Queue");
 	si.lpfnCreate = SettingsQueueForm::create;
-	
+
 	g_settingsPages << si;
-	
+
 	si.icon = DelayedIcon(":/fatrat/miscellaneous.png");
 	si.title = QObject::tr("Drop-box");
 	si.lpfnCreate = SettingsDropBoxForm::create;
-	
+
 	g_settingsPages << si;
-	
+
 	si.icon = DelayedIcon(":/menu/network.png");
 	si.title = QObject::tr("Network");
 	si.lpfnCreate = SettingsNetworkForm::create;
-	
+
 	g_settingsPages << si;
-	
+
 	si.icon = DelayedIcon(":/fatrat/rss.png");
 	si.title = QObject::tr("RSS");
 	si.lpfnCreate = SettingsRssForm::create;
 	si.pfnApply = SettingsRssForm::applySettings;
-	
+
 	g_settingsPages << si;
-	
+
 	si.icon = DelayedIcon(":/fatrat/scheduler.png");
 	si.title = QObject::tr("Scheduler");
 	si.lpfnCreate = SettingsSchedulerForm::create;
@@ -93,7 +93,7 @@ void initSettingsPages()
 	si.title = QObject::tr("Clipboard monitor");
 	si.lpfnCreate = SettingsClipboardMonitorForm::create;
 	//si.pfnApply = SettingsClipboardMonitorForm::applySettings;
-	
+
 	g_settingsPages << si;
 }
 
@@ -158,7 +158,7 @@ void initSettingsDefaults(QString manualPath)
 		g_settings = new QSettings;
 	else
 		g_settings = new QSettings(manualPath, QSettings::IniFormat, qApp);
-	
+
 	QLatin1String df("/defaults.conf");
 	QString path = getDataFileDir("/data", df) + df;
 

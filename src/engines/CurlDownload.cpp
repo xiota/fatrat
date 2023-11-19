@@ -78,7 +78,7 @@ CurlDownload::~CurlDownload()
 void CurlDownload::init(QString uri, QString dest)
 {
 	UrlClient::UrlObject obj;
-	
+
 	int hash = uri.lastIndexOf("#__filename=");
 	if(hash != -1)
 	{
@@ -89,9 +89,9 @@ void CurlDownload::init(QString uri, QString dest)
 	hash = uri.indexOf('#');
 	if(hash != -1)
 		uri.resize(hash);
-	
+
 	obj.url = QUrl::fromPercentEncoding(uri.toUtf8());
-	
+
 	if(obj.url.userInfo().isEmpty())
 	{
 		QList<Auth> auths = Auth::loadAuths();
@@ -99,30 +99,30 @@ void CurlDownload::init(QString uri, QString dest)
 		{
 			if(!QRegularExpression(a.strRegExp).exactMatch(uri))
 				continue;
-			
+
 			obj.url.setUserName(a.strUser);
 			obj.url.setPassword(a.strPassword);
-			
+
 			enterLogMessage(tr("Loaded stored authentication data, matched regexp %1").arg(a.strRegExp));
-			
+
 			break;
 		}
 	}
-	
+
 	obj.proxy = getSettingsValue("httpftp/defaultproxy").toString();
 	obj.ftpMode = UrlClient::FtpPassive;
-	
+
 	m_dir.setPath(dest);
 	m_dir.mkpath(".");
-	
+
 	QString scheme = obj.url.scheme();
 	if(scheme != "http" && scheme != "ftp" && scheme != "ftps" && scheme != "sftp" && scheme != "https")
 		throw RuntimeException(tr("Unsupported protocol: \"%1\"").arg(scheme));
-	
+
 	m_urls.clear();
 	m_urls << obj;
 	m_listActiveSegments << 0;
-	
+
 	if(m_strFile.isEmpty())
 		generateName();
 }
@@ -149,7 +149,7 @@ int CurlDownload::acceptable(QString uri, bool)
 {
 	QUrl url = uri;
 	QString scheme = url.scheme();
-	
+
 	if(scheme != "http" && scheme != "ftp" && scheme != "ftps" && scheme != "https" && scheme != "sftp")
 		return 0;
 	else
@@ -161,12 +161,12 @@ void CurlDownload::globalInit()
 	new CurlPoller;
 
 	CurlPoller::setTransferTimeout(getSettingsValue("httpftp/timeout").toInt());
-	
+
 	SettingsItem si;
 	si.icon = DelayedIcon(":/fatrat/httpftp.png");
 	si.title = tr("HTTP/FTP");
 	si.lpfnCreate = HttpFtpSettings::create;
-	
+
 	addSettingsPage(si);
 }
 
@@ -182,7 +182,7 @@ void CurlDownload::setObject(QString target)
 	{
 		if(!QFile::rename(filePath(), target+"/"+m_strFile))
 			throw RuntimeException(tr("Cannot move the file."));
-			
+
 		m_dir = dirnew;
 	}
 }
@@ -376,26 +376,26 @@ void CurlDownload::load(const QDomNode& map)
 	m_listActiveSegments.clear();
 	foreach(QString seg, activeSegments)
 		m_listActiveSegments << seg.toInt();
-	
+
 	QDomElement url = map.firstChildElement("url");
 	while(!url.isNull())
 	{
 		UrlClient::UrlObject obj;
-		
+
 		obj.url = getXMLProperty(url, "address");
 		obj.strReferrer = getXMLProperty(url, "referrer");
 		obj.proxy = getXMLProperty(url, "proxy");
 		obj.ftpMode = (UrlClient::FtpMode) getXMLProperty(url, "ftpmode").toInt();
 		obj.strBindAddress = getXMLProperty(url, "bindip");
 		obj.effective = getXMLProperty(url, "effective");
-		
+
 		url = url.nextSiblingElement("url");
-		
+
 		m_urls << obj;
 	}
 
 	QDomElement segment, segments = map.firstChildElement("segments");
-	
+
 	m_segmentsLock.lockForWrite();
 	if(!segments.isNull())
 		segment = segments.firstChildElement("segment");
@@ -418,32 +418,32 @@ void CurlDownload::load(const QDomNode& map)
 
 	autoCreateSegment();
 	m_segmentsLock.unlock();
-	
+
 	Transfer::load(map);
 }
 
 void CurlDownload::save(QDomDocument& doc, QDomNode& map) const
 {
 	Transfer::save(doc, map);
-	
+
 	setXMLProperty(doc, map, "dir", m_dir.path());
 	setXMLProperty(doc, map, "knowntotal", QString::number(m_nTotal));
 	setXMLProperty(doc, map, "filename", m_strFile);
 	setXMLProperty(doc, map, "autoname", QString::number(m_bAutoName));
-	
+
 	for(int i=0;i<m_urls.size();i++)
 	{
 		QDomElement sub = doc.createElement("url");
 		//sub.setAttribute("id", QString::number(i));
 		const UrlClient::UrlObject& url = m_urls[i];
-		
+
 		setXMLProperty(doc, sub, "address", QString(url.url.toString()));
 		setXMLProperty(doc, sub, "effective", QString(url.effective.toEncoded()));
 		setXMLProperty(doc, sub, "referrer", url.strReferrer);
 		setXMLProperty(doc, sub, "proxy", url.proxy.toString());
 		setXMLProperty(doc, sub, "ftpmode", QString::number( (int) url.ftpMode ));
 		setXMLProperty(doc, sub, "bindip", url.strBindAddress);
-		
+
 		map.appendChild(sub);
 	}
 
@@ -526,10 +526,10 @@ void CurlDownload::updateSegmentProgress()
 void CurlDownload::fillContextMenu(QMenu& menu)
 {
 	QAction* a;
-	
+
 	//a = menu.addAction(tr("Switch mirror"));
 	//connect(a, SIGNAL(triggered()), this, SLOT(switchMirror()));
-	
+
 	a = menu.addAction(tr("Compute hash..."));
 	connect(a, SIGNAL(triggered()), this, SLOT(computeHash()));
 }
@@ -539,18 +539,18 @@ void CurlDownload::switchMirror()
 {
 	int prev,cur;
 	prev = cur = m_nUrl;
-	
+
 	cur++;
 	if(cur >= m_urls.size())
 		cur = 0;
-	
+
 	if(cur == prev)
 		enterLogMessage(tr("No mirror to switch to!"));
 	else
 	{
 		enterLogMessage(tr("Switching mirror: %1 -> %2").arg(m_urls[prev].url.toString()).arg(m_urls[cur].url.toString()));
 		m_nUrl = cur;
-		
+
 		if(isActive())
 		{
 			changeActive(false);
@@ -568,7 +568,7 @@ void CurlDownload::computeHash()
 		   QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok)
 			return;
 	}
-	
+
 	HashDlg dlg(getMainWindow(), filePath());
 	dlg.exec();
 }
@@ -844,7 +844,7 @@ void CurlDownload::startSegment(int urlIndex)
 	seg.bytes = 0;
 	seg.urlIndex = urlIndex;
 
-	
+
 	if (!m_nTotal)
 	{
 		bytes = -1;
@@ -1007,7 +1007,7 @@ void CurlDownload::startSegment(int urlIndex)
 			bytes = freeSegs[bestSegment].bytes;
 		}
 	}
-	
+
 
 	// start a new download thread
 	qDebug() << "Start new seg: " << seg.offset << seg.offset+bytes;

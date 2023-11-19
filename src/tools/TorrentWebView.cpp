@@ -75,14 +75,14 @@ void TorrentWebView::titleChanged(QString title)
 {
 	QString newtitle = tr("Torrent details");
 	newtitle += ": ";
-	
+
 	if(title.size() > 25)
 	{
 		title.resize(22);
 		title += "...";
 	}
 	newtitle += title;
-	
+
 	emit changeTabTitle(newtitle);
 }
 

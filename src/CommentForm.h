@@ -37,12 +37,12 @@ public:
 	{
 		setupUi(me);
 	}
-	
+
 	virtual void load()
 	{
 		textEdit->setPlainText(m_transfer->comment());
 	}
-	
+
 	virtual void accepted()
 	{
 		m_transfer->setComment(textEdit->toPlainText());

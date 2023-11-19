@@ -35,7 +35,7 @@ HttpFtpSettings::HttpFtpSettings(QWidget* w, QObject* parent)
 	: QObject(parent)
 {
 	setupUi(w);
-	
+
 	connect(pushAuthAdd, SIGNAL(clicked()), this, SLOT(authAdd()));
 	connect(pushAuthEdit, SIGNAL(clicked()), this, SLOT(authEdit()));
 	connect(pushAuthDelete, SIGNAL(clicked()), this, SLOT(authDelete()));
@@ -44,13 +44,13 @@ HttpFtpSettings::HttpFtpSettings(QWidget* w, QObject* parent)
 void HttpFtpSettings::load()
 {
 	bool bFound = false;
-	
+
 	checkForbidIPv6->setChecked(getSettingsValue("httpftp/forbidipv6").toBool());
-	
+
 	// LOAD PROXYS
 	m_listProxy = Proxy::loadProxys();
 	m_defaultProxy = getSettingsValue("httpftp/defaultproxy").toString();
-	
+
 	comboDefaultProxy->clear();
 	comboDefaultProxy->addItem(tr("None", "No proxy"));
 	for(int i=0;i<m_listProxy.size();i++)
@@ -59,17 +59,17 @@ void HttpFtpSettings::load()
 		if(m_listProxy[i].uuid == m_defaultProxy)
 		{
 			comboDefaultProxy->setCurrentIndex(i+1);
-			
+
 			bFound = true;
 		}
 	}
-	
+
 	if(!bFound)
 		m_defaultProxy = QUuid();
-	
+
 	// LOAD AUTHs
 	m_listAuth = Auth::loadAuths();
-	
+
 	listAuths->clear();
 	foreach(Auth a, m_listAuth)
 		listAuths->addItem(a.strRegExp);
@@ -89,7 +89,7 @@ void HttpFtpSettings::accepted()
 	else
 		m_defaultProxy = m_listProxy[index-1].uuid;
 	setSettingsValue("httpftp/defaultproxy", m_defaultProxy.toString());
-	
+
 	Auth::saveAuths(m_listAuth);
 	setSettingsValue("httpftp/forbidipv6", checkForbidIPv6->isChecked());
 
@@ -109,7 +109,7 @@ void HttpFtpSettings::accepted()
 void HttpFtpSettings::authAdd()
 {
 	UserAuthDlg dlg(true, pushAuthAdd->parentWidget());
-	
+
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		m_listAuth << dlg.m_auth;
@@ -122,10 +122,10 @@ void HttpFtpSettings::authEdit()
 	int index = listAuths->currentRow();
 	if(index < 0)
 		return;
-	
+
 	UserAuthDlg dlg(true, pushAuthAdd->parentWidget());
 	dlg.m_auth = m_listAuth[index];
-	
+
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		m_listAuth[index] = dlg.m_auth;
@@ -138,7 +138,7 @@ void HttpFtpSettings::authDelete()
 	int index = listAuths->currentRow();
 	if(index < 0)
 		return;
-	
+
 	if(QMessageBox::warning(pushAuthAdd->parentWidget(), tr("Delete user credentials"), tr("Do you really want to delete the selected user credentials?"),
 	   QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
 	{

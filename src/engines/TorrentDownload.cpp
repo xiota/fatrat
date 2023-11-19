@@ -121,13 +121,13 @@ TorrentDownload::~TorrentDownload()
 int TorrentDownload::acceptable(QString uri, bool)
 {
 	bool istorrent;
-	
+
 	if(uri.endsWith(".torrent", Qt::CaseInsensitive))
 		istorrent = true;
 	else
 	{
 		istorrent = false;
-		
+
 		for(int i=0;i<m_listBTLinks.size();i++)
 		{
 			if(m_listBTLinks[i].exactMatch(uri))
@@ -139,7 +139,7 @@ int TorrentDownload::acceptable(QString uri, bool)
 				qDebug() << m_listBTLinks[i].pattern() << "not matched by" << uri;
 		}
 	}
-		
+
         if(uri.startsWith("http://") || uri.startsWith("ftp://"))
                 return (istorrent) ? 3 : 1;
 	if(istorrent)
@@ -284,12 +284,12 @@ void TorrentDownload::globalInit()
 	fillSettings(params.settings);
 
 	m_session = new libtorrent::session(params);
-	
+
 	if(getSettingsValue("torrent/pex").toBool())
 		m_session->add_extension(&libtorrent::create_ut_pex_plugin);
-	
+
 	m_worker = new TorrentWorker;
-	
+
 	g_geoIPLib.setFileName("libGeoIP");
 	if(g_geoIPLib.load())
 	{
@@ -297,10 +297,10 @@ void TorrentDownload::globalInit()
 		GeoIP_country_name_by_addr_imp = (const char*(*)(void*, const char*)) g_geoIPLib.resolve("GeoIP_country_name_by_addr");
 		GeoIP_country_code_by_addr_imp = (const char*(*)(void*, const char*)) g_geoIPLib.resolve("GeoIP_country_code_by_addr");
 		GeoIP_delete_imp = (void(*)(void*)) g_geoIPLib.resolve("GeoIP_delete");
-		
+
 		g_pGeoIP = GeoIP_new_imp(1 /*GEOIP_MEMORY_CACHE*/);
 	}
-	
+
 	QFile file;
 	if(openDataFile(&file, "/data/btlinks.txt"))
 	{
@@ -312,9 +312,9 @@ void TorrentDownload::globalInit()
 			m_listBTLinks << QRegularExpression(line);
 		}
 	}
-	
+
 	SettingsItem si;
-	
+
 	si.icon = DelayedIcon(":/fatrat/bittorrent.png");
 	si.title = tr("BitTorrent");
 	si.lpfnCreate = TorrentSettings::create;
@@ -328,7 +328,7 @@ void TorrentDownload::globalInit()
 	si.webSettingsScript = "/scripts/settings/bittorrent.js";
 	si.webSettingsIconURL = "/img/settings/bittorrent.png";
 #endif
-	
+
 	addSettingsPage(si);
 }
 
@@ -361,7 +361,7 @@ void TorrentDownload::globalExit()
 
 	delete m_worker;
 	delete m_session;
-	
+
 	if(g_pGeoIP != 0)
 		GeoIP_delete_imp(g_pGeoIP);
 }
@@ -403,35 +403,35 @@ void TorrentDownload::createDefaultPriorityList()
 void TorrentDownload::init(QString source, QString target)
 {
 	m_strTarget = target;
-	
+
 	m_seedLimitRatio = getSettingsValue("torrent/maxratio").toDouble();
 	m_seedLimitUpload = 0;
-	
+
 	try
 	{
 		if(source.startsWith("file://"))
 			source = source.mid(7);
-		
+
 		bool localFile = source.startsWith('/');
 		bool magnetLink = source.startsWith(MAGNET_PREFIX);
-		
+
 		if(localFile || magnetLink)
 		{
 			libtorrent::storage_mode_t storageMode;
 			storageMode = (libtorrent::storage_mode_t) getSettingsValue("torrent/allocation").toInt();
-			
+
 			if(localFile)
 			{
 				QFile in(source);
-				
+
 				if(!in.open(QIODevice::ReadOnly))
 					throw RuntimeException(tr("Unable to open the file!"));
-				
+
 				libtorrent::add_torrent_params params;
 				std::shared_ptr<libtorrent::torrent_info> ti = std::make_shared<libtorrent::torrent_info>(source.toStdString());
 
 				m_info = ti;
-				
+
 				params.ti = ti;
 				params.save_path = target.toStdString();
 				params.storage_mode = storageMode;
@@ -439,7 +439,7 @@ void TorrentDownload::init(QString source, QString target)
 
 				if (!isActive())
 					params.flags |= libtorrent::torrent_flags::paused;
-				
+
 				m_handle = m_session->add_torrent(params);
 				//m_handle = m_session->add_torrent(m_info, target.toStdString(), libtorrent::entry(), storageMode, !isActive());
 			}
@@ -457,26 +457,26 @@ void TorrentDownload::init(QString source, QString target)
 
 				m_handle = m_session->add_torrent(params);
 			}
-			
-			
+
+
 			{
 				int limit;
-				
+
 				limit = getSettingsValue("torrent/maxuploads_loc").toInt();
 				m_handle.set_max_uploads(limit ? limit : limit-1);
-				
+
 				limit = getSettingsValue("torrent/maxconnections_loc").toInt();
 				m_handle.set_max_connections(limit ? limit : limit-1);
 			}
-			
+
 			if(localFile)
 			{
 				m_bHasHashCheck = true;
-				
+
 				createDefaultPriorityList();
 				m_worker->doWork();
 				storeTorrent(source);
-				
+
 				if(!m_bAuto)
 					RssFetcher::performManualCheck(name());
 			}
@@ -502,13 +502,13 @@ void TorrentDownload::downloadTorrent(QString source)
 
 	QUuid webseed = QUuid::fromString(getSettingsValue("torrent/proxy_webseed").toString());
 	Proxy pr = Proxy::getProxy(webseed);
-	
+
 	m_pFileDownload = new QNetworkAccessManager(this);
 	m_pFileDownloadTemp = new QTemporaryFile(m_pFileDownload);
 
 	if (pr.nType != Proxy::ProxyNone)
 		m_pFileDownload->setProxy(pr);
-	
+
 	if(!m_pFileDownloadTemp->open())
 	{
 		delete m_pFileDownload;
@@ -526,13 +526,13 @@ bool TorrentDownload::storeTorrent(QString orig)
 {
 	QString str = storedTorrentName();
 	QDir dir = QDir::home();
-	
+
 	dir.mkpath(TORRENT_FILE_STORAGE);
 	if(!dir.cd(TORRENT_FILE_STORAGE))
 		return false;
-	
+
 	str = dir.absoluteFilePath(str);
-	
+
 	if(str != orig)
 		return QFile::copy(orig, str);
 	else
@@ -559,7 +559,7 @@ bool TorrentDownload::storeTorrent()
 	{
 		libtorrent::add_torrent_params ap;
 		ap.ti = info;
-		
+
 		auto buf = libtorrent::write_torrent_file_buf(ap, libtorrent::write_torrent_flags_t(0));
 
 		QFile file(str);
@@ -570,7 +570,7 @@ bool TorrentDownload::storeTorrent()
 		}
 
 		file.write(buf.data(), buf.size());
-		
+
 		file.close();
 		return true;
 	}
@@ -582,12 +582,12 @@ QString TorrentDownload::storedTorrentName() const
 {
 	if(!m_info)
 		return QString();
-	
+
 	QString hash;
-	
+
 	auto bn = m_info->info_hash();
 	hash = QByteArray((char*) bn.begin(), 20).toHex();
-	
+
 	return QString("%1 - %2.torrent").arg(name()).arg(hash);
 }
 
@@ -644,7 +644,7 @@ void TorrentDownload::torrentFileDone(QNetworkReply* reply)
 			}
 		}
 	}
-	
+
 	m_pFileDownload->deleteLater();
 	m_pFileDownload = 0;
 	m_pFileDownloadTemp = 0;
@@ -676,7 +676,7 @@ QString TorrentDownload::object() const
 void TorrentDownload::changeActive(bool nowActive)
 {
 //	bool bEnableRecheck = false;
-	
+
 	if(m_handle.is_valid())
 	{
 		if(nowActive)
@@ -707,7 +707,7 @@ void TorrentDownload::setSpeedLimits(int down, int up)
 			down--;
 		if(!up)
 			up--;
-		
+
 		m_handle.set_upload_limit(up);
 		m_handle.set_download_limit(down);
 	}
@@ -777,88 +777,88 @@ libtorrent::bdecode_node TorrentDownload::bdecode(QString d)
 void TorrentDownload::load(const QDomNode& map)
 {
 	Transfer::load(map);
-	
+
 	try
 	{
 		QByteArray torrent_resume;
 		QString str;
 		QDir dir = QDir::home();
-	
+
 		dir.cd(TORRENT_FILE_STORAGE);
-		
+
 		str = getXMLProperty(map, "seedlimitratio");
 		if(!str.isEmpty())
 			m_seedLimitRatio = str.toDouble();
 		else
 			m_seedLimitRatio = getSettingsValue("torrent/maxratio").toDouble();
-		
+
 		str = getXMLProperty(map, "seedlimitupload");
 		m_seedLimitUpload = str.toInt();
 
 		m_bSuperSeeding = getXMLProperty(map, "superseeding").toInt() != 0;
-		
+
 		m_strTarget = str = getXMLProperty(map, "target");
-		
+
 		QString sfile = dir.absoluteFilePath( getXMLProperty(map, "torrent_file") );
-		
+
 		if(!QFile(sfile).open(QIODevice::ReadOnly))
 		{
 			m_strError = tr("Unable to open the file!");
 			setState(Failed);
 			return;
 		}
-		
+
 		std::shared_ptr<libtorrent::torrent_info> ti = std::make_shared<libtorrent::torrent_info>(sfile.toStdString());
 		m_info = ti;
-		
+
 		torrent_resume = QByteArray::fromBase64(getXMLProperty(map, "torrent_resume").toUtf8());
-		
+
 		std::cout << "Loaded " << getXMLProperty(map, "torrent_resume").size() << " bytes of resume data\n";
-		
+
 		libtorrent::add_torrent_params params;
 		std::vector<char> torrent_resume2 = std::vector<char>(torrent_resume.data(), torrent_resume.data()+torrent_resume.size());
 
 		if(!torrent_resume2.empty())
 			params = libtorrent::read_resume_data(torrent_resume);
-		
+
 		//params.storage_mode = (libtorrent::storage_mode_t) getSettingsValue("torrent/allocation").toInt();
 		params.storage_mode = libtorrent::storage_mode_sparse; // don't force full allocation upon load
 		params.ti = ti;
-		
+
 		QByteArray path = str.toUtf8();
 		params.save_path = path.constData();
 		params.flags = libtorrent::torrent_flags::paused;
-		
+
 		m_handle = m_session->add_torrent(params);
-		
+
 		m_handle.set_max_uploads(getSettingsValue("torrent/maxuploads").toInt());
 		m_handle.set_max_connections(getSettingsValue("torrent/maxconnections").toInt());
-		
+
 		//m_nPrevDownload = getXMLProperty(map, "downloaded").toLongLong();
 		//m_nPrevUpload = getXMLProperty(map, "uploaded").toLongLong();
-		
+
 		str = getXMLProperty(map, "priorities");
-		
+
 		if(str.isEmpty())
 			createDefaultPriorityList();
 		else
 		{
 			QStringList priorities = str.split('|');
 			int numFiles = m_info->num_files();
-			
+
 			if(numFiles != priorities.size())
 				createDefaultPriorityList();
 			else
 			{
 				m_vecPriorities.resize(numFiles);
-				
+
 				for(int i=0;i<numFiles;i++)
 					m_vecPriorities[i] = priorities[i].toInt();
 			}
-			
+
 			m_handle.prioritize_files(m_vecPriorities);
 		}
-		
+
 		std::vector<libtorrent::announce_entry> trackers;
 		QDomElement n = map.firstChildElement("trackers");
 		if(!n.isNull())
@@ -872,10 +872,10 @@ void TorrentDownload::load(const QDomNode& map)
 			}
 			m_handle.replace_trackers(trackers);
 		}
-		
+
 		std::set<std::string> cur_seeds = m_handle.url_seeds();
 		std::set<std::string> now_seeds;
-		
+
 		n = map.firstChildElement("url_seeds");
 		if(!n.isNull())
 		{
@@ -886,23 +886,23 @@ void TorrentDownload::load(const QDomNode& map)
 				now_seeds.insert(url.constData());
 				seed = seed.nextSiblingElement("url");
 			}
-			
+
 			std::set<std::string> diff;
-			
+
 			std::set_difference(cur_seeds.begin(), cur_seeds.end(), now_seeds.begin(), now_seeds.end(), std::inserter(diff, diff.begin()));
 			for(std::set<std::string>::iterator it=diff.begin(); it != diff.end(); it++)
 				m_handle.remove_url_seed(*it);
-			
+
 			diff.clear();
-			
+
 			std::set_difference(now_seeds.begin(), now_seeds.end(), cur_seeds.begin(), cur_seeds.end(), std::inserter(diff, diff.begin()));
 			for(std::set<std::string>::iterator it=diff.begin(); it != diff.end(); it++)
 				m_handle.add_url_seed(*it);
 		}
-		
+
 		if(isActive())
 			m_handle.resume();
-		
+
 		m_worker->doWork();
 	}
 	catch(const std::exception& e)
@@ -923,29 +923,29 @@ void TorrentDownload::addUrlSeed(QString str)
 void TorrentDownload::save(QDomDocument& doc, QDomNode& map) const
 {
 	Transfer::save(doc, map);
-	
+
 	if(m_info != 0)
 	{
 		setXMLProperty(doc, map, "torrent_file", storedTorrentName());
-		
+
 		if(m_handle.is_valid() && m_status.state != libtorrent::torrent_status::downloading_metadata)
 		{
 			m_mutexAlerts.lock();
 			m_handle.save_resume_data();
-			
+
 			bool saved = false;
 			for(int i = 0; i < 3 && !saved; i++)
 			{
 				std::vector<libtorrent::alert*> alerts;
 				TorrentDownload::m_session->pop_alerts(&alerts);
-	
+
 				if (alerts.empty())
 				{
 					Sleeper::msleep(250);
 					i++;
 					continue;
 				}
-				
+
 				for (libtorrent::alert* aaa : alerts)
 				{
 					if(libtorrent::save_resume_data_alert* alert = libtorrent::alert_cast<libtorrent::save_resume_data_alert>(aaa))
@@ -970,17 +970,17 @@ void TorrentDownload::save(QDomDocument& doc, QDomNode& map) const
 				std::cout << "Torrent state did not get saved!\n";
 		}
 	}
-	
+
 	setXMLProperty(doc, map, "target", object());
 	setXMLProperty(doc, map, "downloaded", QString::number( totalDownload() ));
 	setXMLProperty(doc, map, "uploaded", QString::number( totalUpload() ));
-	
+
 	setXMLProperty(doc, map, "seedlimitratio", QString::number(m_seedLimitRatio));
 	setXMLProperty(doc, map, "seedlimitupload", QString::number(m_seedLimitUpload));
 	setXMLProperty(doc, map, "superseeding", QString::number(m_bSuperSeeding));
-	
+
 	QString prio;
-	
+
 	for(size_t i=0;i<m_vecPriorities.size();i++)
 	{
 		if(i > 0)
@@ -988,7 +988,7 @@ void TorrentDownload::save(QDomDocument& doc, QDomNode& map) const
 		prio += QString::number(m_vecPriorities[i]);
 	}
 	setXMLProperty(doc, map, "priorities", prio);
-	
+
 	if(m_handle.is_valid())
 	{
 		QDomElement sub = doc.createElement("trackers");
@@ -997,7 +997,7 @@ void TorrentDownload::save(QDomDocument& doc, QDomNode& map) const
 		{
 			setXMLProperty(doc, sub, "tracker", QString::fromUtf8(trackers[i].url.c_str()));
 		}
-		
+
 		sub = doc.createElement("url_seeds");
 		std::set<std::string> seeds = m_handle.url_seeds();
 		for(std::set<std::string>::iterator it=seeds.begin(); it != seeds.end(); it++)
@@ -1010,12 +1010,12 @@ void TorrentDownload::save(QDomDocument& doc, QDomNode& map) const
 QString TorrentDownload::message() const
 {
 	QString state;
-	
+
 	if(this->state() == Failed)
 		return m_strError;
 	else if(m_pFileDownload != 0)
 		return tr("Downloading the .torrent file");
-	
+
 	if(!(m_status.flags & libtorrent::torrent_flags::paused))
 	{
 		switch(m_status.state)
@@ -1031,18 +1031,18 @@ QString TorrentDownload::message() const
 		case libtorrent::torrent_status::downloading:
 		case libtorrent::torrent_status::finished:
 			state += tr("Seeders: %1 (%2) | Leechers: %3 (%4)");
-			
+
 			if(m_status.state == libtorrent::torrent_status::downloading)
 				state = state.arg(m_status.num_seeds);
 			else
 				state = state.arg(QString());
-			
+
 			if(m_status.num_complete >= 0)
 				state = state.arg(m_status.num_complete);
 			else
 				state = state.arg('?');
 			state = state.arg(m_status.num_peers - m_status.num_seeds);
-			
+
 			if(m_status.num_incomplete >= 0)
 				state = state.arg(m_status.num_incomplete);
 			else
@@ -1065,14 +1065,14 @@ QString TorrentDownload::message() const
 				state = state.arg(m_status.num_complete);
 			else
 				state = state.arg("?");
-			
+
 			if (m_status.num_incomplete >= 0)
 				state = state.arg(m_status.num_incomplete);
 			else
 				state = state.arg("?");
 		}
 	}
-	
+
 	return state;
 }
 
@@ -1136,10 +1136,10 @@ const char* TorrentDownload::detailsScript() const
 QVariantMap TorrentDownload::properties() const
 {
 	QVariantMap rv;
-	
+
 	if (!m_info)
 		return rv;
-	
+
 	qint64 d, u;
 	QString ratio;
 
@@ -1230,10 +1230,10 @@ void TorrentWorker::processAlert(libtorrent::alert* aaa)
 		TorrentDownload* d = getByHandle(alert->handle);
 		std::string smsg = aaa->message();
 		QString errmsg = QString::fromUtf8(smsg.c_str());
-			
+
 		if(!d)
 			return;
-			
+
 		if(IS_ALERT_S(file_error_alert))
 		{
 			d->setState(Transfer::Failed);
@@ -1249,7 +1249,7 @@ void TorrentWorker::processAlert(libtorrent::alert* aaa)
 			QString desc = tr("Tracker failure: %1, %2 times in a row ")
 					.arg(alert->failure_reason())
 					.arg(alert->times_in_row);
-				
+
 			d->enterLogMessage(desc);
 		}
 		else if(IS_ALERT_S(tracker_warning_alert))
@@ -1317,14 +1317,14 @@ void TorrentWorker::processAlert(libtorrent::alert* aaa)
 void TorrentWorker::doWork()
 {
 	QMutexLocker l(&m_mutex);
-	
+
 	foreach(TorrentDownload* d, m_objects)
 	{
 		if(!d->m_handle.is_valid())
 			continue;
-		
+
 		d->m_status = d->m_handle.status();
-		
+
 		if(!d->m_info)
 		{
             if(!d->m_status.has_metadata)
@@ -1332,18 +1332,18 @@ void TorrentWorker::doWork()
 			d->m_info = d->m_handle.torrent_file();
 		}
 	}
-	
+
 	foreach(TorrentDownload* d, m_objects)
 	{
 		if(!d->m_handle.is_valid() || !d->m_info)
 			continue;
-		
+
 		if(d->m_bHasHashCheck && d->m_status.state != libtorrent::torrent_status::checking_files && d->m_status.state != libtorrent::torrent_status::checking_resume_data)
 		{
 			d->m_bHasHashCheck = false;
 			//d->m_nPrevDownload = d->done();
 		}
-		
+
 		if(d->isActive())
 		{
 			const bool isSuperSeeding = d->m_handle.flags() & libtorrent::torrent_flags::super_seeding;
@@ -1386,22 +1386,22 @@ void TorrentWorker::doWork()
 					flags &= ~libtorrent::torrent_flags::super_seeding;
 				d->m_handle.set_flags(flags);
 			}
-			
+
 			int down, up, sdown, sup;
-			
+
 			down = d->m_handle.download_limit();
 			up = d->m_handle.upload_limit();
-			
+
 			d->internalSpeedLimits(sdown, sup);
-			
+
 			if(!sdown) sdown--;
 			if(!sup) sup--;
-			
+
 			if(down != sdown || up != sup)
 				d->setSpeedLimits(sdown, sup);
 		}
 	}
-	
+
 	QMutexLocker ll(&TorrentDownload::m_mutexAlerts);
 	std::vector<libtorrent::alert*> alerts;
 
@@ -1416,7 +1416,7 @@ void TorrentDownload::forceReannounce()
 {
 	if(!m_handle.is_valid())
 		return;
-	
+
 	if(isActive())
 	{
 		qDebug() << "TorrentDownload::forceReannounce(): announce";
@@ -1433,16 +1433,16 @@ void TorrentDownload::forceRecheck()
 {
 	if(isActive() || !m_handle.is_valid())
 		return;
-	
+
 	m_bHasHashCheck = false;
-	
+
 	m_handle.force_recheck();
 }
 
 void TorrentDownload::fillContextMenu(QMenu& menu)
 {
 	QAction* a;
-	
+
 	a = menu.addAction(tr("Force announce"));
 	connect(a, SIGNAL(triggered()), this, SLOT(forceReannounce()));
 	a = menu.addAction(QIcon(":/menu/reload.png"), tr("Recheck files"));

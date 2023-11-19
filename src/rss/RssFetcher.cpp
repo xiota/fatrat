@@ -68,7 +68,7 @@ void RssFetcher::enable(bool bEnable)
 {
 	const int interval = getSettingsValue("rss/interval").toInt();
 	bool bActive = m_timer.isActive();
-	
+
 	if(bActive != bEnable)
 	{
 		if(bEnable)
@@ -88,14 +88,14 @@ void RssFetcher::enable(bool bEnable)
 void RssFetcher::loadFeeds(QList<RssFeed>& items)
 {
 	int amount = g_settings->beginReadArray("rss/feeds");
-	
+
 	for(int i=0;i<amount;i++)
 	{
 		g_settings->setArrayIndex(i);
 		RssFeed f = { g_settings->value("name").toString(), g_settings->value("url").toString(), 0 };
 		items << f;
 	}
-	
+
 	g_settings->endArray();
 }
 
@@ -104,9 +104,9 @@ void RssFetcher::refresh()
 	m_feeds.clear();
 	loadFeeds(m_feeds);
 	m_items.clear();
-	
+
 	m_bAllOK = true;
-	
+
 	for(int i=0;i<m_feeds.size();i++)
 	{
 		QNetworkRequest request;
@@ -120,7 +120,7 @@ void RssFetcher::requestFinished(QNetworkReply* reply)
 {
 	RssFeed* feed = 0;
 	bool bLast = true;
-	
+
 	for(int i=0;i<m_feeds.size();i++)
 	{
 		if(m_feeds[i].reply == reply)
@@ -128,26 +128,26 @@ void RssFetcher::requestFinished(QNetworkReply* reply)
 		if(m_feeds[i].reply != reply && m_feeds[i].reply != 0)
 			bLast = false;
 	}
-	
+
 	if(!feed)
 		return;
-	
+
 	if(reply->error() == QNetworkReply::NoError)
 	{
 		QIODevice* device = reply;
-		
+
 		device->seek(0);
-		
+
 		QXmlSimpleReader reader;
 		QXmlInputSource source(device);
-		
+
 		reader.setErrorHandler(this);
 		reader.setContentHandler(this);
-		
+
 		m_bInItem = false;
 		m_strCurrentSource = feed->url;
 		m_itemNext = RssItem();
-		
+
 		if(!reader.parse(&source))
 		{
 			qDebug() << "Parse error:" << static_cast<QXmlErrorHandler*>(this)->errorString();
@@ -161,13 +161,13 @@ void RssFetcher::requestFinished(QNetworkReply* reply)
 		Logger::global()->enterLogMessage("RSS", tr("Failed to fetch the feed \"%1\"").arg(feed->name));
 		m_bAllOK = false;
 	}
-		
-	
+
+
 	feed->reply = 0;
-	
+
 	if(bLast)
 		processItems();
-	
+
 	sender()->deleteLater();
 }
 
@@ -176,21 +176,21 @@ void RssFetcher::processItems()
 	QReadLocker l(&g_queuesLock);
 	QList<RssRegexp> regexps;
 	QStringList newprocessed, processed = g_settings->value("rss/processed").toStringList();
-	
+
 	loadRegexps(regexps);
-	
+
 	if(!m_bAllOK)
 		newprocessed << processed;
-	
+
 	foreach(RssItem item, m_items)
 	{
 		if(!processed.contains(item.url))
 			processItem(regexps, item);
 		newprocessed << item.url;
 	}
-	
+
 	saveRegexps(regexps);
-	
+
 	g_settings->setValue("rss/processed", newprocessed);
 }
 
@@ -215,7 +215,7 @@ void RssFetcher::processItem(QList<RssRegexp>& regexps, const RssItem& item)
 				else
 					continue;
 			}
-			
+
 			QStringList urls;
 
 			if(!regexps[i].linkRegexp.isEmpty())
@@ -268,7 +268,7 @@ void RssFetcher::updateRegexpQueues(QList<RssRegexp>& items)
 				break;
 			}
 		}
-		
+
 		if(items[i].queueIndex < 0)
 			items.removeAt(i--);
 	}
@@ -277,12 +277,12 @@ void RssFetcher::updateRegexpQueues(QList<RssRegexp>& items)
 void RssFetcher::loadRegexps(QList<RssRegexp>& items)
 {
 	int count = g_settings->beginReadArray("rss/regexps");
-	
+
 	for(int i=0;i<count;i++)
 	{
 		RssRegexp item;
 		g_settings->setArrayIndex(i);
-		
+
 		item.regexp = QRegularExpression(g_settings->value("regexp").toString(), Qt::CaseInsensitive);
 		item.queueUUID = g_settings->value("queueUUID").toString();
 		item.source = g_settings->value("source").toString();
@@ -297,12 +297,12 @@ void RssFetcher::loadRegexps(QList<RssRegexp>& items)
 		item.queueIndex = -1;
 		item.addPaused = g_settings->value("addPaused").toBool();
 		item.linkRegexp = QRegularExpression(g_settings->value("linkRegexp").toString(), Qt::CaseInsensitive);
-		
+
 		items << item;
 	}
-	
+
 	g_settings->endArray();
-	
+
 	updateRegexpQueues(items);
 }
 
@@ -310,7 +310,7 @@ void RssFetcher::saveRegexps(const QList<RssRegexp>& items)
 {
 	g_settings->remove("rss/regexps");
 	g_settings->beginWriteArray("rss/regexps", items.size());
-	
+
 	for(int i=0;i<items.size();i++)
 	{
 		g_settings->setArrayIndex(i);
@@ -328,7 +328,7 @@ void RssFetcher::saveRegexps(const QList<RssRegexp>& items)
 		g_settings->setValue("addPaused", items[i].addPaused);
 		g_settings->setValue("linkRegexp", items[i].linkRegexp.pattern());
 	}
-	
+
 	g_settings->endArray();
 }
 
@@ -336,14 +336,14 @@ void RssFetcher::saveFeeds(const QList<RssFeed>& items)
 {
 	g_settings->remove("rss/feeds");
 	g_settings->beginWriteArray("rss/feeds", items.size());
-	
+
 	for(int i=0;i<items.size();i++)
 	{
 		g_settings->setArrayIndex(i);
 		g_settings->setValue("name", items[i].name);
 		g_settings->setValue("url", items[i].url);
 	}
-	
+
 	g_settings->endArray();
 }
 
@@ -351,22 +351,22 @@ void RssFetcher::performManualCheck(QString torrentName)
 {
 	QList<RssRegexp> re;
 	bool bModified = false;
-	
+
 	loadRegexps(re);
-	
+
 	for(int i=0;i<re.size();i++)
 	{
 		if(!re[i].excludeManuals || re[i].regexp.indexIn(torrentName) < 0)
 			continue;
 		QString episode = generateEpisodeName(re[i], torrentName);
-		
+
 		if(!episode.isEmpty() && !re[i].epDone.contains(episode))
 		{
 			bModified = true;
 			re[i].epDone << episode;
 		}
 	}
-	
+
 	if(bModified)
 		saveRegexps(re);
 }
@@ -375,7 +375,7 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match, QString itemName
 {
 	QString rval;
 	QChar zero('0');
-	
+
 	if(match.tvs == RssRegexp::None)
 		return QString();
 	else if(match.tvs == RssRegexp::SeasonBased)
@@ -409,7 +409,7 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match, QString itemName
 				year += 2000;
 			int day = matcher2.cap(1).toInt();
 			int month = matcher2.cap(2).toInt();
-			
+
 			dayMonthHeuristics(day, month);
 			rval = QString("%1-%2-%3").arg(year).arg(month,2,10,zero).arg(day,2,10,zero);
 		}
@@ -420,27 +420,27 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match, QString itemName
 			int year = matcher3.cap(3).toInt();
 			if(year < 100)
 				year += 2000;
-			
+
 			QString m = matcher3.cap(2);
 			for(int i=0;i<12;i++)
 			{
 				QString sshort = months[i];
 				sshort.resize(3);
-				
+
 				if(!m.compare(months[i], Qt::CaseInsensitive) || !m.compare(sshort, Qt::CaseInsensitive))
 				{
 					month = i+1;
 					break;
 				}
 			}
-			
+
 			if(month)
 			{
 				rval = QString("%1-%2-%3").arg(year).arg(month,2,10,zero).arg(matcher3.cap(1).toInt(),2,10,zero);
 			}
 		}
 	}
-	
+
 	if(!rval.isEmpty())
 	{
 		if(itemName.indexOf("trailer", -1, Qt::CaseInsensitive) != -1
@@ -462,7 +462,7 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match, QString itemName
 				rval += "|proper";
 		}
 	}
-	
+
 	return rval;
 }
 
@@ -471,7 +471,7 @@ void RssFetcher::dayMonthHeuristics(int& day, int& month)
 	// Some Americans are complete idiots when it comes to writing dates
 	// Hence we have to do some guessing to recognize which field is the month and which one is the day
 	QDate date = QDate::currentDate();
-			
+
 	if(month > 12)
 		std::swap(month, day);
 	else
@@ -479,7 +479,7 @@ void RssFetcher::dayMonthHeuristics(int& day, int& month)
 		int prevmonth = date.month() - 1;
 		if(!prevmonth)
 			prevmonth = 12;
-				
+
 		if(month != date.month() && month != prevmonth && (day == date.month() || day == prevmonth))
 			std::swap(month, day);
 	}
@@ -521,7 +521,7 @@ bool RssFetcher::endElement(const QString& namespaceURI, const QString& localNam
 		m_itemNext = RssItem();
 		m_bInItem = false;
 	}
-	
+
 	m_itemNextType = RssItem::None;
 	return true;
 }
@@ -537,7 +537,7 @@ bool RssFetcher::characters(const QString& ch)
 		else if(m_itemNextType == RssItem::Url)
 			m_itemNext.url += ch;
 	}
-	
+
 	return true;
 }
 

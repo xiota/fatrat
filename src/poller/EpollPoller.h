@@ -38,9 +38,9 @@ class EpollPoller : public Poller
 public:
 	EpollPoller(QObject* parent);
 	virtual ~EpollPoller();
-	
+
 	virtual int handle();
-	
+
 	virtual int addSocket(int socket, int flags);
 	virtual int removeSocket(int socket);
 	virtual int wait(int msec, Event* ev, int max);

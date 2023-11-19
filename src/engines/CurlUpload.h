@@ -43,16 +43,16 @@ Q_OBJECT
 public:
 	CurlUpload();
 	virtual ~CurlUpload();
-	
+
 	static Transfer* createInstance() { return new CurlUpload; }
 	static int acceptable(QString url, bool bDrop);
-	
+
 	virtual void init(QString source, QString target);
 	virtual void setObject(QString source);
-	
+
 	virtual void changeActive(bool nowActive);
 	virtual void setSpeedLimits(int, int up);
-	
+
 	virtual QString object() const { return m_strSource; }
 	virtual QString myClass() const { return "FtpUpload"; }
 	virtual QString name() const { return m_strName; }
@@ -61,11 +61,11 @@ public:
 	virtual void speeds(int& down, int& up) const;
 	virtual qulonglong total() const { return m_nTotal; }
 	virtual qulonglong done() const;
-	
+
 	virtual void load(const QDomNode& map);
 	virtual void save(QDomDocument& doc, QDomNode& map) const;
 	virtual WidgetHostChild* createOptionsWidget(QWidget*);
-	
+
 	virtual void fillContextMenu(QMenu& menu);
 	virtual QString remoteURI() const;
 protected slots:
@@ -74,7 +74,7 @@ protected:
 	virtual CURL* curlHandle();
 	virtual void transferDone(CURLcode result);
 	virtual size_t readData(char* buffer, size_t maxData);
-	
+
 	static int seek_function(QFile* file, curl_off_t offset, int origin);
 	static int curl_debug_callback(CURL*, curl_infotype type, char* text, size_t bytes, CurlUpload* This);
 protected:
@@ -86,7 +86,7 @@ protected:
 	FtpMode m_mode;
 	QUuid m_proxy;
 	char m_errorBuffer[CURL_ERROR_SIZE];
-	
+
 	friend class FtpUploadOptsForm;
 };
 

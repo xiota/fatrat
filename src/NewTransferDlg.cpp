@@ -51,56 +51,56 @@ NewTransferDlg::NewTransferDlg(QWidget* parent)
 	textURIs->setFocus(Qt::OtherFocusReason);
 	spinDown->setRange(0,INT_MAX);
 	spinUp->setRange(0,INT_MAX);
-	
+
 	connect(toolBrowse, SIGNAL(pressed()), this, SLOT(browse()));
 	connect(radioDownload, SIGNAL(clicked()), this, SLOT(switchMode()));
 	connect(radioUpload, SIGNAL(clicked()), this, SLOT(switchMode()));
 	connect(pushAddFiles, SIGNAL(clicked()), this, SLOT(browse2()));
 	connect(toolAuth, SIGNAL(clicked()), this, SLOT(authData()));
 	connect(toolAuth2, SIGNAL(clicked()), this, SLOT(authData()));
-	
+
 	comboClass->addItem(tr("Auto detect"));
-	
+
 	for(int i=0;i<g_enginesDownload.size();i++)
 		comboClass->addItem(g_enginesDownload[i].longName);
-	
+
 	comboClass2->addItem(tr("Auto detect"));
-	
+
 	for(int i=0;i<g_enginesUpload.size();i++)
 		comboClass2->addItem(g_enginesUpload[i].longName);
-	
+
 	QMenu* menu = new QMenu(toolAddSpecial);
 	QAction* act;
-	
+
 	act = menu->addAction(tr("Add local files..."));
 	connect(act, SIGNAL(triggered()), this, SLOT(browse2()));
-	
+
 	act = menu->addAction(tr("Add contents of a text file..."));
 	connect(act, SIGNAL(triggered()), this, SLOT(addTextFile()));
-	
+
 	act = menu->addAction(tr("Add from clipboard"));
 	connect(act, SIGNAL(triggered()), this, SLOT(addClipboard()));
-	
+
 	toolAddSpecial->setMenu(menu);
 }
 
 int NewTransferDlg::exec()
 {
 	int result;
-	
+
 	load();
 	result = QDialog::exec();
-	
+
 	if(result == QDialog::Accepted)
 		accepted();
-	
+
 	return result;
 }
 
 /*
 void NewTransferDlg::accept()
 {
-	
+
 	if(radioDownload->isChecked())
 	{
 		if((!m_bNewTransfer || !textURIs->toPlainText().isEmpty()) && !comboDestination->currentText().isEmpty())
@@ -115,7 +115,7 @@ void NewTransferDlg::accept()
 	}
 	else
 		QDialog::accept();
-	
+
 }
 */
 
@@ -127,7 +127,7 @@ void NewTransferDlg::accepted()
 		m_strURIs = textURIs->toPlainText();
 		m_strDestination = comboDestination->currentText();
 		m_nClass = comboClass->currentIndex()-1;
-		
+
 		if(!m_lastDirs.contains(m_strDestination) && !m_strDestination.isEmpty())
 		{
 			if(m_lastDirs.size() >= 5)
@@ -143,12 +143,12 @@ void NewTransferDlg::accepted()
 		m_strDestination = comboDestination2->currentText();
 		m_nClass = comboClass2->currentIndex()-1;
 	}
-	
+
 	m_bDetails = checkDetails->isChecked();
 	m_bPaused = checkPaused->isChecked();
 	m_nDownLimit = spinDown->value()*1024;
 	m_nUpLimit = spinUp->value()*1024;
-	
+
 	m_nQueue = comboQueue->currentIndex();
 }
 
@@ -191,7 +191,7 @@ void NewTransferDlg::load()
 		m_lastDirs.append(m_strDestination);
 		g_settings->setValue("lastdirs", m_lastDirs);
 	}*/
-	
+
 	{
 		bool bFound = false;
 		for(int i=0;i<g_enginesDownload.size();i++)
@@ -203,7 +203,7 @@ void NewTransferDlg::load()
 				break;
 			}
 		}
-		
+
 		if(!bFound)
 		{
 			for(int i=0;i<g_enginesDownload.size();i++)
@@ -218,16 +218,16 @@ void NewTransferDlg::load()
 	}
 	{
 		QReadLocker l(&g_queuesLock);
-		
+
 		for(int i=0;i<g_queues.size();i++)
 		{
 			comboQueue->addItem(g_queues[i]->name());
 			comboQueue->setItemData(i, g_queues[i]->defaultDirectory());
 		}
-		
+
 		if(g_queues.isEmpty())
 			m_nQueue = -1;
-		
+
 		comboQueue->setCurrentIndex(m_nQueue);
 		if(m_strDestination.isEmpty())
 		{
@@ -237,18 +237,18 @@ void NewTransferDlg::load()
 				m_strDestination = QDir::homePath();
 		}
 	}
-	
+
 	m_lastDirs = g_settings->value("lastdirs").toStringList();
 	if(!m_lastDirs.contains(m_strDestination))
 		comboDestination->addItem(m_strDestination);
 	comboDestination->addItems(m_lastDirs);
 	comboDestination->setEditText(m_strDestination);
-	
+
 	spinDown->setValue(m_nDownLimit/1024);
 	spinUp->setValue(m_nUpLimit/1024);
 	checkDetails->setChecked(m_bDetails);
 	checkPaused->setChecked(m_bPaused);
-	
+
 	if(m_mode == Transfer::Upload)
 	{
 		stackedWidget->setCurrentIndex(1);
@@ -257,7 +257,7 @@ void NewTransferDlg::load()
 	}
 	else
 		textURIs->setText(m_strURIs);
-	
+
 	connect(comboQueue, SIGNAL(currentIndexChanged(int)), this, SLOT(queueChanged(int)));
 }
 
@@ -265,7 +265,7 @@ void NewTransferDlg::queueChanged(int now)
 {
 	if(now == m_nQueue)
 		return;
-	
+
 	if(getDestination() == comboQueue->itemData(m_nQueue).toString())
 		setDestination(comboQueue->itemData(now).toString());
 	m_nQueue = now;
@@ -301,9 +301,9 @@ void NewTransferDlg::browse()
 void NewTransferDlg::browse2()
 {
 	QStringList files;
-	
+
 	files = QFileDialog::getOpenFileNames(this, "FatRat");
-	
+
 	if(radioUpload->isChecked())
 		textFiles->append(files.join("\n"));
 	else
@@ -314,7 +314,7 @@ void NewTransferDlg::browse2()
 void NewTransferDlg::textChanged()
 {
 	QStringList list;
-	
+
 	if(radioDownload->isChecked())
 		list = textURIs->toPlainText().split(QRegularExpression('\n'), Qt::SkipEmptyParts);
 	else
@@ -341,7 +341,7 @@ void NewTransferDlg::authData()
 {
 	UserAuthDlg dlg(false, this);
 	dlg.m_auth = m_auth;
-	
+
 	if(dlg.exec() == QDialog::Accepted)
 		m_auth = dlg.m_auth;
 }

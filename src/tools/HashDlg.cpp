@@ -32,15 +32,15 @@ HashDlg::HashDlg(QWidget* parent, QString file)
 	: QDialog(parent), m_file(file), m_thread(&m_file)
 {
 	setupUi(this);
-	
+
 	connect(&m_thread, SIGNAL(progress(int)), progressBar, SLOT(setValue(int)));
 	connect(&m_thread, SIGNAL(finished(QByteArray)), this, SLOT(finished(QByteArray)));
 	connect(pushCompute, SIGNAL(clicked()), this, SLOT(compute()));
 	connect(toolBrowse, SIGNAL(clicked()), this, SLOT(browse()));
-	
+
 	comboHash->addItems( QStringList() << "MD4" << "MD5" << "SHA1");
 	comboHash->setCurrentIndex(1);
-	
+
 	lineFile->setText(file);
 }
 
@@ -56,9 +56,9 @@ HashDlg::~HashDlg()
 void HashDlg::browse()
 {
 	QString newfile;
-	
+
 	newfile = QFileDialog::getOpenFileName(this, tr("Choose file"), lineFile->text());
-	
+
 	if(!newfile.isNull())
 	{
 		lineFile->setText(newfile);
@@ -76,13 +76,13 @@ void HashDlg::compute()
 		QMessageBox::critical(this, "FatRat", tr("Unable to open the file!"));
 		return;
 	}
-	
+
 	lineResult->clear();
-	
+
 	comboHash->setEnabled(false);
 	pushCompute->setEnabled(false);
 	pushCompute->setEnabled(false);
-	
+
 	progressBar->setValue(0);
 	m_thread.setAlgorithm((QCryptographicHash::Algorithm) comboHash->currentIndex());
 	m_thread.start(QThread::LowestPriority);
@@ -91,13 +91,13 @@ void HashDlg::compute()
 void HashDlg::finished(QByteArray result)
 {
 	QByteArray data = result.toHex();
-	
+
 	pushCompute->setEnabled(true);
 	comboHash->setEnabled(true);
 	pushCompute->setEnabled(true);
-	
+
 	lineResult->setText(data.data());
-	
+
 	m_file.close();
 }
 
@@ -112,18 +112,18 @@ void HashThread::run()
 	QByteArray buf;
 	qint64 total = m_file->size();
 	int pcts = 0;
-	
+
 	m_bStop = false;
-	
+
 	do
 	{
 		int npcts;
-		
+
 		buf = m_file->read(1024);
 		hash.addData(buf);
-		
+
 		npcts = 100.0*m_file->pos()/double(total);
-		
+
 		if(npcts > pcts)
 		{
 			pcts = npcts;
@@ -131,7 +131,7 @@ void HashThread::run()
 		}
 	}
 	while(buf.size() == 1024 && !m_bStop);
-	
+
 	if(!m_bStop)
 		emit finished(hash.result());
 }

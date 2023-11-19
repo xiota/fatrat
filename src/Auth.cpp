@@ -32,21 +32,21 @@ extern QSettings* g_settings;
 QList<Auth> Auth::loadAuths()
 {
 	QList<Auth> r;
-	
+
 	int count = g_settings->beginReadArray("httpftp/auths");
 	for(int i=0;i<count;i++)
 	{
 		Auth auth;
 		g_settings->setArrayIndex(i);
-		
+
 		auth.strRegExp = g_settings->value("regexp").toString();
 		auth.strUser = g_settings->value("user").toString();
 		auth.strPassword = g_settings->value("password").toString();
-		
+
 		r << auth;
 	}
 	g_settings->endArray();
-	
+
 	return r;
 }
 

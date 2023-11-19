@@ -34,7 +34,7 @@ SimpleEmail::SimpleEmail(QString server, QString from, QString to, QString messa
 	connect(m_pSocket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(m_pSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(m_pSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
-	
+
 	m_pSocket->connectToHost(server, 25);
 }
 
@@ -53,7 +53,7 @@ void SimpleEmail::readyRead()
 		line = m_pSocket->readLine();
 	}
 	while(m_pSocket->canReadLine() && line[3] != ' ');
-	
+
 	if ( m_state == Init && line[0] == '2')
 	{
 		*m_pStream << "HELO fatrat\r\n";

@@ -111,11 +111,11 @@ void insertArgument(QDomDocument& doc, QDomElement& where, const QVariant& what)
 			value = doc.createElement("value");
 			array = doc.createElement("array");
 			data = doc.createElement("data");
-			
+
 			QList<QVariant> list = what.toList();
 			foreach(QVariant v, list)
 				insertArgument(doc, data, v);
-			
+
 			array.appendChild(data);
 			value.appendChild(array);
 			where.appendChild(value);
@@ -142,20 +142,20 @@ void insertArgument(QDomDocument& doc, QDomElement& where, const QVariant& what)
 			QDomElement _struct, value;
 			_struct = doc.createElement("struct");
 			value = doc.createElement("value");
-			
+
 			QMap<QString, QVariant> map = what.toMap();
 			for(QMap<QString, QVariant>::iterator it = map.begin(); it != map.end(); it++)
 			{
 				QDomElement member = doc.createElement("member");
 				QDomElement name = doc.createElement("name");
 				QDomText ntext = doc.createTextNode(it.key());
-				
+
 				name.appendChild(ntext);
 				member.appendChild(name);
 				insertArgument(doc, member, it.value());
 				_struct.appendChild(member);
 			}
-			
+
 			value.appendChild(_struct);
 			where.appendChild(value);
 		}
@@ -187,14 +187,14 @@ QVariant XmlRpc::parseResponse(const QByteArray& response)
 	QDomElement root;
 	QString msg;
 	bool bFault;
-	
+
 	if(!doc.setContent(response, false, &msg))
 		throw RuntimeException(msg);
-	
+
 	root = doc.documentElement();
 	if(root.tagName() != "methodResponse")
 		throw RuntimeException(QObject::tr("Not a XML-RPC response"));
-	
+
 	QDomElement e = root.firstChildElement();
 	if(e.tagName() == "fault")
 		bFault = true;
@@ -202,7 +202,7 @@ QVariant XmlRpc::parseResponse(const QByteArray& response)
 		bFault = false;
 	else
 		throw RuntimeException(QObject::tr("Not a XML-RPC response"));
-	
+
 	if(!bFault)
 	{
 		QDomElement p = e.firstChildElement("param");
@@ -212,7 +212,7 @@ QVariant XmlRpc::parseResponse(const QByteArray& response)
 		QDomElement value = p.firstChildElement("value");
 		if(value.isNull())
 			throw RuntimeException(QObject::tr("Invalid XML-RPC response"));
-			
+
 		return parseValue(value);
 	}
 	else
@@ -220,7 +220,7 @@ QVariant XmlRpc::parseResponse(const QByteArray& response)
 		QDomElement value = e.firstChildElement("value");
 		if(value.isNull())
 			throw RuntimeException(QObject::tr("Server is indicating an unknown failure"));
-		
+
 		QMap<QString, QVariant> v = parseValue(value).toMap();
 		throw RuntimeException(QString("%1 %2").arg(v["faultCode"].toString()).arg(v["faultString"].toString()));
 	}
@@ -231,7 +231,7 @@ QVariant parseValue(const QDomElement& where)
 	QDomElement ce = where.firstChildElement();
 	QString c = ce.tagName();
 	QString contents;
-	
+
 	if(c.isNull())
 	{
 		contents = where.text();
@@ -239,7 +239,7 @@ QVariant parseValue(const QDomElement& where)
 	}
 	else
 		contents = ce.firstChild().toText().data();
-	
+
 	if(c == "boolean")
 		return contents.toInt() != 0;
 	else if(c == "i4" || c == "int")
@@ -257,11 +257,11 @@ QVariant parseValue(const QDomElement& where)
 		QDomElement data = ce.firstChildElement("data");
 		if(data.isNull())
 			return QVariant();
-		
+
 		QDomElement v = data.firstChildElement("value");
 		QList<QVariant> variantList;
 		bool allstring = true;
-		
+
 		while(!v.isNull())
 		{
 			QVariant parsed = parseValue(v);
@@ -278,20 +278,20 @@ QVariant parseValue(const QDomElement& where)
 			var.convert(QVariant::StringList);
 			return var;
 		}
-		
+
 		return variantList;
 	}
 	else if(c == "struct")
 	{
 		QDomElement v = ce.firstChildElement("member");
 		QMap<QString, QVariant> variantMap;
-		
+
 		while(!v.isNull())
 		{
 			QDomElement name, value;
 			name = v.firstChildElement("name");
 			value = v.firstChildElement("value");
-			
+
 			if(!name.isNull() && !value.isNull())
 			{
 				QString n = name.firstChild().toText().data();
@@ -299,10 +299,10 @@ QVariant parseValue(const QDomElement& where)
 			}
 			else
 				qDebug() << "XmlRpc::parseValue(): invalid struct member encountered";
-			
+
 			v = v.nextSiblingElement("member");
 		}
-		
+
 		return variantMap;
 	}
 	else

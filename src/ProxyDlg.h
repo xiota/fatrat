@@ -38,16 +38,16 @@ public:
 	{
 		setupUi(this);
 		m_data.nType = Proxy::ProxyHttp;
-		
+
 		comboType->addItem("HTTP");
 		comboType->addItem("SOCKS 5");
-		
+
 		m_data.nType = Proxy::ProxyHttp;
 		m_data.nPort = 80;
-		
+
 		lineName->setFocus(Qt::OtherFocusReason);
 	}
-	
+
 	int exec()
 	{
 		int r;
@@ -57,7 +57,7 @@ public:
 		linePort->setText(QString::number(m_data.nPort));
 		lineUser->setText(m_data.strUser);
 		linePassword->setText(m_data.strPassword);
-		
+
 		if((r = QDialog::exec()) == QDialog::Accepted)
 		{
 			m_data.nType = (Proxy::ProxyType) comboType->currentIndex();

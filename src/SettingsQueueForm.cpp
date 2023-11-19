@@ -44,7 +44,7 @@ void SettingsQueueForm::load()
 	lineSmtp->setText( getSettingsValue("smtpserver").toString() );
 	lineSender->setText( getSettingsValue("emailsender").toString() );
 	lineRecipient->setText( getSettingsValue("emailrcpt").toString() );
-	
+
 	checkPopup->setEnabled(QSystemTrayIcon::supportsMessages());
 	checkAutoRemove->setChecked( getSettingsValue("autoremove").toBool() );
 	checkTooltips->setChecked(getSettingsValue("queue_tooltips").toBool());

@@ -116,7 +116,7 @@ void JVM::jvmStartup(QString libname)
 #else
 	JavaVMOption options[7];
 #endif
-	
+
 	JNIEnv* env;
 	QByteArray classpath = getClassPath().toUtf8();
 	int mb = getSettingsValue("java/maxheap").toInt();
@@ -203,7 +203,7 @@ QString JVM::getClassPath()
 	{
 		if (!rv.isEmpty())
 			rv += ':';
-		if (f == "fatrat-jplugins-core.jar" && hasCore) 
+		if (f == "fatrat-jplugins-core.jar" && hasCore)
 			continue;
 		rv += dir.filePath(f);
 	}

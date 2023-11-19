@@ -49,10 +49,10 @@ private slots:
 	void browse2();
 	void switchMode();
 	void authData();
-	
+
 	void addTextFile();
 	void addClipboard();
-	
+
 	void queueChanged(int now);
 public:
 	QString m_strURIs,m_strDestination,m_strClass;

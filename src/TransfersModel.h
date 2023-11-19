@@ -60,7 +60,7 @@ public:
 	Qt::DropActions supportedDragActions() const;
 	QStringList mimeTypes() const { return QStringList("application/x-fatrat-transfer"); }
 	QMimeData* mimeData(const QModelIndexList &indexes) const;
-	
+
 	void setQueue(int q);
 	void refresh();
 	int remapIndex(int index);
@@ -70,14 +70,14 @@ private:
 	int m_nLastRowCount;
 	QIcon* m_states[12];
 	QMap<int,int> m_filterMapping;
-	
+
 	struct RowData
 	{
 		Transfer::State state;
 		QString name, speedDown, speedUp, timeLeft, message, progress, size;
 		Transfer::Mode mode, primaryMode;
 		float fProgress;
-		
+
 		inline bool operator!=(const RowData& d2)
 		{
 #define COMP(n) n != d2.n
@@ -86,11 +86,11 @@ private:
 #undef COMP
 		}
 	};
-	
+
 	static RowData createDataSet(Transfer* t);
-	
+
 	QVector<RowData> m_lastData;
-	
+
 	friend class ProgressDelegate;
 };
 

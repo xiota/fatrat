@@ -53,25 +53,25 @@ void JUploadPlugin::registerNatives()
 void JUploadPlugin::startUploadChunk(JNIEnv* env, jobject jthis, jstring jurl, jobjectArray mimeParts, jlong offset, jlong bytes)
 {
 	JUploadPlugin* This = static_cast<JUploadPlugin*>(getCObject(jthis));
-	
+
 	QString url = JString(jurl).str();
 	JArray array(mimeParts);
 	QList<JavaUpload::MimePart> parts;
-	
+
 	for (size_t i = 0; i < array.size(); i++)
 	{
 		JMimePart part = array.getObject(i);
 		JavaUpload::MimePart xpart;
-		
+
 		xpart.filePart = part.mimePartType() == JMimePart::MimePartFile;
 		xpart.name = part.name();
-		
+
 		if (!xpart.filePart)
 			xpart.value = part.value();
-		
+
 		parts << xpart;
 	}
-	
+
 	static_cast<JavaUpload*>(This->m_transfer)->startUpload(url, parts, qint64(offset), qint64(bytes));
 }
 
@@ -79,7 +79,7 @@ void JUploadPlugin::putDownloadLink(JNIEnv* env, jobject jthis, jstring urlDownl
 {
 	JUploadPlugin* This = static_cast<JUploadPlugin*>(getCObject(jthis));
 	QString klink, dlink = JString(urlDownload).str();
-	
+
 	if (killLink)
 		klink = JString(killLink).str();
 	static_cast<JavaUpload*>(This->m_transfer)->putDownloadLink(dlink, klink);
@@ -96,7 +96,7 @@ JUploadPlugin::JMimePart::MimePartType JUploadPlugin::JMimePart::mimePartType()
 		return MimePartValue;
 	if (instanceOf("info.dolezel.fatrat.plugins.UploadPlugin$MimePartFile"))
 		return MimePartFile;
-	
+
 	throw RuntimeException(tr("Unknown class: %1").arg(getClass().getClassName()));
 }
 

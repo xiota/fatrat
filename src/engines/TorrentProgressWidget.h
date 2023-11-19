@@ -39,15 +39,15 @@ Q_OBJECT
 public:
 	TorrentProgressWidget(QWidget* parent);
 	~TorrentProgressWidget();
-	
+
 	void generate(const libtorrent::bitfield& data);
 	void generate(const std::vector<int>& data);
-	
+
 	// blue colored
 	static QImage generate(const libtorrent::bitfield& data, int width, quint32* buf, float sstart = 0, float send = 0);
 	// grey colored
 	static QImage generate(const std::vector<int>& data, int width, quint32* buf, float sstart = 0, float send = -1);
-	
+
 	void paintEvent(QPaintEvent* event);
 private:
 	QImage m_image;

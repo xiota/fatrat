@@ -45,7 +45,7 @@ Q_OBJECT
 public:
 	CurlDownload();
 	~CurlDownload();
-	
+
 	virtual void init(QString source, QString target);
 	virtual void changeActive(bool bActove);
 	virtual void setObject(QString object);
@@ -58,13 +58,13 @@ public:
 	virtual void load(const QDomNode& map);
 	virtual void save(QDomDocument& doc, QDomNode& map) const;
 	virtual void setSpeedLimits(int down, int up);
-	
+
 	static int acceptable(QString uri, bool);
 	static QDialog* createMultipleOptionsWidget(QWidget* parent, QList<Transfer*>& transfers);
 	static Transfer* createInstance() { return new CurlDownload; }
 	static void globalInit();
 	static void globalExit();
-	
+
 	virtual WidgetHostChild* createOptionsWidget(QWidget* w);
 	virtual void fillContextMenu(QMenu& menu);
 	virtual QString remoteURI() const;
@@ -87,7 +87,7 @@ private:
 	void setTargetName(QString newFileName);
 	void processHeaders();
 	void checkFileContents();
-	
+
 	static int seek_function(int file, curl_off_t offset, int origin);
 	static size_t process_header(const char* ptr, size_t size, size_t nmemb, CurlDownload* This);
 	static int curl_debug_callback(CURL*, curl_infotype, char* text, size_t bytes, CurlDownload* This);
@@ -135,12 +135,12 @@ protected:
 	QDir m_dir;
 	long long m_nTotal;
 	mutable long long m_nStart;
-	
+
 	QString m_strFile;
 	bool m_bAutoName;
-	
+
 	char m_errorBuffer[CURL_ERROR_SIZE];
-	
+
 	QList<UrlClient::UrlObject> m_urls;
 	QList<Segment> m_segments;
 	mutable QReadWriteLock m_segmentsLock;
@@ -148,7 +148,7 @@ protected:
 	QTimer m_timer;
 	UrlClient* m_nameChanger;
 	QList<int> m_listActiveSegments;
-	
+
 	friend class HttpOptsWidget;
 	friend class HttpUrlOptsDlg;
 	friend class HttpDetailsBar;

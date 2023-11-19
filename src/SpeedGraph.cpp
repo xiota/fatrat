@@ -149,9 +149,9 @@ void SpeedGraph::draw(QQueue<QPair<int,int> > data, QSize size, QPaintDevice* de
 	}
 	filler[elems] = QPoint(filler[elems-1].x(), height);
 	filler[elems+1] = QPoint(filler[0].x(), height);
-	
+
 	painter.setPen(Qt::darkBlue);
-	
+
 	if(bFilled)
 	{
 		QColor blueFill(Qt::darkBlue);
@@ -159,10 +159,10 @@ void SpeedGraph::draw(QQueue<QPair<int,int> > data, QSize size, QPaintDevice* de
 		painter.setBrush(blueFill);
 		painter.drawPolygon(filler.constData(), filler.size(), Qt::OddEvenFill);
 	}
-	
+
 	lines[elems-1] = QLine(2,7,12,7);
 	painter.drawLines(lines.constData(), lines.size());
-	
+
 	pos = width;
 	for(int i = 0;i<elems;i++) // upload speed
 	{
@@ -174,9 +174,9 @@ void SpeedGraph::draw(QQueue<QPair<int,int> > data, QSize size, QPaintDevice* de
 	}
 	filler[elems] = QPoint(filler[elems-1].x(), height);
 	filler[elems+1] = QPoint(filler[0].x(), height);
-	
+
 	painter.setPen(Qt::darkRed);
-	
+
 	if(bFilled)
 	{
 		QColor redFill(Qt::darkRed);
@@ -184,10 +184,10 @@ void SpeedGraph::draw(QQueue<QPair<int,int> > data, QSize size, QPaintDevice* de
 		painter.setBrush(redFill);
 		painter.drawPolygon(filler.constData(), filler.size(), Qt::OddEvenFill);
 	}
-	
+
 	lines[elems-1] = QLine(2,19,12,19);
 	painter.drawLines(lines.constData(), lines.size());
-	
+
 	painter.setPen(Qt::black);
 	for(int i=0;i<4;i++)
 	{
@@ -195,17 +195,17 @@ void SpeedGraph::draw(QQueue<QPair<int,int> > data, QSize size, QPaintDevice* de
 		painter.drawLine(x, height, x, height-15);
 		painter.drawText(x+2, height-2, tr("%1 mins ago").arg( (seconds/4) * (i+1) / 60.0 ));
 	}
-	
+
 	painter.drawText(15,12,tr("Download"));
 	painter.drawText(15,24,tr("Upload"));
-	
+
 	for(int i=1;i<10;i++)
 	{
 		int pos = int( float(height)/10.f*i );
-		
+
 		painter.setPen(QPen(Qt::gray, 1.0, Qt::DashLine));
 		painter.drawLine(0,pos,width,pos);
-		
+
 		painter.setPen(Qt::black);
 		painter.drawText(0,pos-10,formatSize( qulonglong( top/10.f*(10-i) ), true));
 	}
@@ -222,9 +222,9 @@ void SpeedGraph::paintEvent(QPaintEvent* event)
 void SpeedGraph::drawNoData(QSize size, QPainter& painter)
 {
 	QFont font = painter.font();
-	
+
 	font.setPixelSize(20);
-	
+
 	painter.setFont(font);
 	painter.setPen(Qt::gray);
 	painter.drawText(QRect(QPoint(0,0), size), Qt::AlignHCenter | Qt::AlignVCenter, tr("NO DATA"));

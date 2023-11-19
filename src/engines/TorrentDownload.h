@@ -67,28 +67,28 @@ Q_OBJECT
 public:
 	TorrentDownload(bool bAuto = false);
 	virtual ~TorrentDownload();
-	
+
 	static Transfer* createInstance() { return new TorrentDownload; }
 	static WidgetHostChild* createSettingsWidget(QWidget* w,QIcon& i);
 	static int acceptable(QString url, bool);
-	
+
 	static void globalInit();
 	static void applySettings();
 	static void globalExit();
-	
+
 	static QByteArray bencode_simple(libtorrent::entry& e);
 	static QString bencode(libtorrent::entry& e);
 	static libtorrent::bdecode_node bdecode_simple(QByteArray d);
 	static libtorrent::bdecode_node bdecode(QString d);
-	
+
 	static libtorrent::proxy_settings proxyToLibtorrent(Proxy p);
-	
+
 	virtual void init(QString source, QString target);
 	virtual void setObject(QString source);
-	
+
 	virtual void changeActive(bool nowActive);
 	virtual void setSpeedLimits(int down, int up);
-	
+
 	virtual QString object() const;
 	virtual QString myClass() const { return "TorrentDownload"; }
 	virtual QString name() const;
@@ -96,7 +96,7 @@ public:
 	virtual void speeds(int& down, int& up) const;
 	virtual qulonglong total() const;
 	virtual qulonglong done() const;
-	
+
 	virtual void load(const QDomNode& map);
 	virtual void save(QDomDocument& doc, QDomNode& map) const;
 	virtual void fillContextMenu(QMenu& menu);
@@ -105,7 +105,7 @@ public:
 	virtual QString remoteURI() const;
 
 	virtual QString dataPath(bool bDirect = true) const;
-	
+
 	qint64 totalDownload() const { return m_status.all_time_download; }
 	qint64 totalUpload() const { return m_status.all_time_upload; }
 
@@ -138,28 +138,28 @@ protected:
 	libtorrent::torrent_handle m_handle;
 	std::shared_ptr<const libtorrent::torrent_info> m_info;
 	libtorrent::torrent_status m_status;
-	
+
 	QString m_strError, m_strTarget;
 	//qint64 m_nPrevDownload, m_nPrevUpload;
 	std::vector<libtorrent::download_priority_t> m_vecPriorities;
 	bool m_bHasHashCheck, m_bAuto, m_bSuperSeeding;
 	QList<QString> m_urlSeeds;
-	
+
 	QNetworkAccessManager* m_pFileDownload;
 	QNetworkReply* m_pReply;
 	QTemporaryFile* m_pFileDownloadTemp;
-	
+
 	// seeding limits
 	double m_seedLimitRatio;
 	int m_seedLimitUpload;
-	
+
 	static libtorrent::session* m_session;
 	static TorrentWorker* m_worker;
 	static bool m_bDHT;
 	static QList<QRegularExpression> m_listBTLinks;
 	static QLabel* m_labelDHTStats;
 	static QMutex m_mutexAlerts;
-	
+
 	friend class TorrentWorker;
 	friend class TorrentDetails;
 	friend class TorrentPiecesModel;

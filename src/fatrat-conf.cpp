@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	QSettings settings;
 
 	QSettings defSettings(DATA_LOCATION "/data/defaults.conf", QSettings::IniFormat, qApp);
-	
+
 	if (argc == 1)
 	{
 		printUsage();
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 				cerr << "WARNING: Skipped invalid argument: " << argv[i] << endl;
 				continue;
 			}
-			
+
 			settings.setValue(arg.left(pos), arg.mid(pos+1));
 		}
 	}

@@ -60,7 +60,7 @@ Q_OBJECT
 public:
 	HasherThread(QByteArray baseDir, libtorrent::create_torrent* info, QObject* parent);
 	~HasherThread();
-	
+
 	virtual void run();
 	const QString& error() const { return m_strError; }
 	libtorrent::create_torrent* info() { return m_info; }

@@ -32,7 +32,7 @@ respects for all of the code used other than "OpenSSL".
 SettingsSchedulerForm::SettingsSchedulerForm(QWidget* w, QObject* parent) : QObject(parent)
 {
 	setupUi(w);
-	
+
 	connect(pushAdd, SIGNAL(clicked()), this, SLOT(add()));
 	connect(pushEdit, SIGNAL(clicked()), this, SLOT(edit()));
 	connect(pushDelete, SIGNAL(clicked()), this, SLOT(remove()));

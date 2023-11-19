@@ -54,34 +54,34 @@ void HttpDetailsBar::paintEvent(QPaintEvent* event)
 	QPainter painter(this);
 	const int width = this->width()-2;
 	const int height = this->height();
-	
+
 	painter.setClipRegion(event->region());
 	painter.fillRect(QRect(0,0,width,height), Qt::white);
 	painter.drawRect(QRect(0, 0, width+1, height-1));
-	
+
 	m_segs.clear();
-	
+
 	if(!m_download)
 		return;
-	
+
 	const qulonglong total = m_download->total();
 	if(!total)
 	{
 		painter.drawText(rect(), Qt::AlignCenter, "?");
 		return;
 	}
-	
+
 	QReadLocker l(&m_download->m_segmentsLock);
 	QPen dotted(Qt::white, 1, Qt::DotLine);
-	
+
 	for(int i=0;i<m_download->m_segments.size();i++)
 	{
 		const CurlDownload::Segment& sg = m_download->m_segments[i];
 		painter.setPen(Qt::white);
-		
+
 		QRect rect = QRect(float(sg.offset)*width/total+1, 1, float(sg.bytes)*width/total, height-2);
 		QLinearGradient gradient(0, 0, 0, height);
-		
+
 		if(sg.client != 0)
 		{
 			gradient.setColorAt(0, sg.color.lighter(200));
@@ -94,11 +94,11 @@ void HttpDetailsBar::paintEvent(QPaintEvent* event)
 			gradient.setColorAt(0.5, Qt::black);
 			gradient.setColorAt(1, Qt::black);
 		}
-		
+
 		painter.fillRect(rect, QBrush(gradient));
-		
+
 		m_segs << QPair<int,int>(rect.x(), rect.right());
-		
+
 		if(m_sel == i)
 		{
 			painter.setPen(dotted);
@@ -181,7 +181,7 @@ void HttpDetailsBar::mousePressEvent(QMouseEvent* event)
 	if(event->button() == Qt::RightButton && m_download != 0 /*&& m_download->isActive()*/)
 	{
 		QMenu menu(this);
-		
+
 		m_download->m_segmentsLock.lockForRead();
 		if(m_sel >= 0 && m_sel < m_segs.size() && m_download->m_segments[m_sel].client)
 		{
@@ -190,17 +190,17 @@ void HttpDetailsBar::mousePressEvent(QMouseEvent* event)
 		//else
 		{
 			QMenu* seg = menu.addMenu(tr("New segment"));
-			
+
 			m_createX = event->x();
-			
+
 			for(int i=0;i<m_download->m_urls.size();i++)
 			{
 				QUrl url = m_download->m_urls[i].url;
 				QString text;
-				
+
 				url.setUserInfo(QString());
 				text = url.toString();
-				
+
 				if(text.size() > 50)
 				{
 					text.resize(47);
@@ -210,7 +210,7 @@ void HttpDetailsBar::mousePressEvent(QMouseEvent* event)
 			}
 		}
 		m_download->m_segmentsLock.unlock();
-		
+
 		menu.exec(QCursor::pos());
 	}
 }

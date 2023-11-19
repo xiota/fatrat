@@ -35,24 +35,24 @@ extern QMap<QString,PluginInfo> g_plugins;
 AboutDlg::AboutDlg(QWidget* parent) : QDialog(parent)
 {
 	setupUi(this);
-	
+
 	QStringList items;
 	items << "FatRat" << tr("License") << tr("Translations") << tr("3rd parties")
 			<< tr("Features") << tr("Plugins");
-	
+
 	QIcon icon(":/fatrat/miscellaneous.png");
 	for(int i=0;i<items.size();i++)
 	{
 		QListWidgetItem* item = new QListWidgetItem(icon,items[i],listMenu);
 		listMenu->addItem(item);
 	}
-	
+
 	labelVersion->setText(tr("Version %1").arg(VERSION));
-	
+
 	loadFile(textLicense, "LICENSE");
 	loadFile(textTranslators, "TRANSLATIONS");
 	loadFile(text3rdParties, "README");
-		
+
 #ifdef WITH_NLS
 	checkFeatureNLS->setChecked(true);
 #endif
@@ -68,7 +68,7 @@ AboutDlg::AboutDlg(QWidget* parent) : QDialog(parent)
 #ifdef WITH_JPLUGINS
 	checkFeatureJavaExtensions->setChecked(true);
 #endif
-	
+
 	processPlugins();
 	listMenu->setCurrentRow(0);
 }
@@ -90,12 +90,12 @@ void AboutDlg::loadFile(QTextEdit* edit, QString filename)
 {
 	QFile file;
 	QString name;
-	
+
 	name = DATA_LOCATION "/";
 	name += filename;
-	
+
 	file.setFileName(name);
 	file.open(QIODevice::ReadOnly);
-	
+
 	edit->setPlainText(QString::fromUtf8(file.readAll()));
 }

@@ -41,10 +41,10 @@ CurlPoller::CurlPoller()
 	curl_global_init(CURL_GLOBAL_SSL);
 	m_curlm = curl_multi_init();
 	m_poller = Poller::createInstance(this);
-	
+
 	curl_multi_setopt(m_curlm, CURLMOPT_SOCKETFUNCTION, socket_callback);
 	curl_multi_setopt(m_curlm, CURLMOPT_SOCKETDATA, static_cast<CurlPoller*>(this));
-	
+
 	if(!m_instance)
 	{
 		m_instance = this;
@@ -55,10 +55,10 @@ CurlPoller::CurlPoller()
 CurlPoller::~CurlPoller()
 {
 	m_bAbort = true;
-	
+
 	if(isRunning())
 		wait();
-	
+
 	if (this == m_instance)
 		m_instance = 0;
 	curl_multi_cleanup(m_curlm);
@@ -285,25 +285,25 @@ int CurlPoller::timer_callback(CURLM* multi, long newtimeout, long* timeout)
 int CurlPoller::socket_callback(CURL* easy, curl_socket_t s, int action, CurlPoller* This, void* socketp)
 {
 	int flags = Poller::PollerOneShot | Poller::PollerError | Poller::PollerHup;
-	
+
 	if(action == CURL_POLL_IN || action == CURL_POLL_INOUT)
 		flags |= Poller::PollerIn;
 	if(action == CURL_POLL_OUT || action == CURL_POLL_INOUT)
 		flags |= Poller::PollerOut;
-	
+
 	if(action == CURL_POLL_REMOVE)
 	{
 		qDebug() << "CurlPoller::socket_callback - remove";
-		
+
 		This->m_socketsToRemove << s;
 		return This->m_poller->removeSocket(s);
 	}
 	else
 	{
 		qDebug() << "CurlPoller::socket_callback - add/mod" << s << flags;
-		
+
 		This->m_socketsToAdd[s] = QPair<int,CurlStat*>(flags, static_cast<CurlStat*>(This->m_users[easy]));
-		
+
 		return This->m_poller->addSocket(s, flags);
 	}
 }
@@ -311,10 +311,10 @@ int CurlPoller::socket_callback(CURL* easy, curl_socket_t s, int action, CurlPol
 void CurlPoller::addTransfer(CurlUser* obj)
 {
 	QMutexLocker locker(&m_usersLock);
-	
+
 	CURL* handle = obj->curlHandle();
 	qDebug() << "CurlPoller::addTransfer" << obj << handle;
-	
+
 	obj->resetStatistics();
 	m_users[handle] = obj;
 	curl_multi_add_handle(m_curlm, handle);
@@ -323,9 +323,9 @@ void CurlPoller::addTransfer(CurlUser* obj)
 void CurlPoller::removeTransfer(CurlUser* obj, bool nodeep)
 {
 	QMutexLocker locker(&m_usersLock);
-	
+
 	qDebug() << "CurlPoller::removeTransfer" << obj << obj->curlHandle();
-	
+
 	CURL* handle = obj->curlHandle();
 	if(handle != 0)
 	{

@@ -42,7 +42,7 @@ Q_OBJECT
 public:
 	Scheduler();
 	virtual ~Scheduler();
-	
+
 	void reload();
 
 	static void loadActions(QList<ScheduledAction>& list);
@@ -68,12 +68,12 @@ struct ScheduledAction
 		whenRepeated = QTime::currentTime();
 		whenOneTime = QDateTime::currentDateTime();
 	}
-	
+
 	enum ActionType
 	{
 		ActionResumeAll, ActionStopAll, ActionSetSpeedLimit
 	};
-	
+
 	QString name;
 	QUuid queue;
 	ActionType action;

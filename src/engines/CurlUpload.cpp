@@ -50,25 +50,25 @@ CurlUpload::~CurlUpload()
 void CurlUpload::init(QString source, QString target)
 {
 	QFileInfo finfo;
-	
+
 	if(source.startsWith("file:///"))
 		source = source.mid(7);
-	
+
 	finfo = QFileInfo(source);
-	
+
 	if(!finfo.exists())
 		throw RuntimeException(tr("File does not exist"));
-	
+
 	m_nTotal = finfo.size();
 	if(m_strName.isEmpty())
 		m_strName = finfo.fileName();
-	
+
 	if(!target.startsWith("ftp://") && !target.startsWith("sftp://"))
 		throw RuntimeException(tr("Invalid protocol for this upload class (FTP)"));
-	
+
 	m_strTarget = target;
 	m_strSource = source;
-	
+
 	if(m_strTarget.userInfo().isEmpty())
 	{
 		QList<Auth> auths = Auth::loadAuths();
@@ -76,12 +76,12 @@ void CurlUpload::init(QString source, QString target)
 		{
 			if(!QRegularExpression(a.strRegExp).exactMatch(target))
 				continue;
-			
+
 			m_strTarget.setUserName(a.strUser);
 			m_strTarget.setPassword(a.strPassword);
-			
+
 			enterLogMessage(tr("Loaded stored authentication data, matched regexp %1").arg(a.strRegExp));
-			
+
 			break;
 		}
 	}
@@ -95,7 +95,7 @@ void CurlUpload::setObject(QString source)
 int CurlUpload::seek_function(QFile* file, curl_off_t offset, int origin)
 {
 	qDebug() << "seek_function" << offset << origin;
-	
+
 	if(origin == SEEK_SET)
 	{
 		if(!file->seek(offset))
@@ -129,9 +129,9 @@ void CurlUpload::changeActive(bool nowActive)
 			setState(Failed);
 			return;
 		}
-		
+
 		m_nTotal = m_file.size();
-		
+
 		m_curl = curl_easy_init();
 		curl_easy_setopt(m_curl, CURLOPT_UPLOAD, true);
 		curl_easy_setopt(m_curl, CURLOPT_INFILESIZE_LARGE, total());
@@ -141,31 +141,31 @@ void CurlUpload::changeActive(bool nowActive)
 		curl_easy_setopt(m_curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
 		curl_easy_setopt(m_curl, CURLOPT_FTP_FILEMETHOD, CURLFTPMETHOD_SINGLECWD);
 		curl_easy_setopt(m_curl, CURLOPT_PROGRESSFUNCTION, anti_crash_fun);
-		
+
 		curl_easy_setopt(m_curl, CURLOPT_ERRORBUFFER, m_errorBuffer);
 		curl_easy_setopt(m_curl, CURLOPT_SSL_VERIFYPEER, false);
 		curl_easy_setopt(m_curl, CURLOPT_SSL_VERIFYHOST, false);
-		
+
 		curl_easy_setopt(m_curl, CURLOPT_READFUNCTION, read_function);
 		curl_easy_setopt(m_curl, CURLOPT_READDATA, static_cast<CurlUser*>(this));
-		
+
 		curl_easy_setopt(m_curl, CURLOPT_SEEKFUNCTION, seek_function);
 		curl_easy_setopt(m_curl, CURLOPT_SEEKDATA, &m_file);
 		curl_easy_setopt(m_curl, CURLOPT_DEBUGFUNCTION, curl_debug_callback);
 		curl_easy_setopt(m_curl, CURLOPT_DEBUGDATA, this);
 		curl_easy_setopt(m_curl, CURLOPT_VERBOSE, true);
-		
+
 		int timeout = getSettingsValue("httpftp/timeout").toInt();
 		curl_easy_setopt(m_curl, CURLOPT_FTP_RESPONSE_TIMEOUT, timeout);
 		curl_easy_setopt(m_curl, CURLOPT_CONNECTTIMEOUT, timeout);
-		
+
 		{
 			QByteArray ba;
 			ba = m_strTarget.toString().toUtf8();
 			if(!ba.endsWith("/"))
 				ba += '/';
 			int end = m_strSource.lastIndexOf('/');
-			
+
 			if(end < 0)
 				ba += m_strSource.toUtf8();
 			else
@@ -177,21 +177,21 @@ void CurlUpload::changeActive(bool nowActive)
 			if(!ba.isEmpty())
 				curl_easy_setopt(m_curl, CURLOPT_INTERFACE, ba.constData());
 		}
-		
+
 		if(m_mode == FtpActive)
 			curl_easy_setopt(m_curl, CURLOPT_FTPPORT, "-");
-		
+
 		Proxy proxy = Proxy::getProxy(m_proxy);
 		if(proxy.nType != Proxy::ProxyNone)
 		{
 			QByteArray p;
-			
+
 			if(proxy.strUser.isEmpty())
 				p = QString("%1:%2").arg(proxy.strIP).arg(proxy.nPort).toLatin1();
 			else
 				p = QString("%1:%2@%3:%4").arg(proxy.strUser).arg(proxy.strPassword).arg(proxy.strIP).arg(proxy.nPort).toLatin1();
 			curl_easy_setopt(m_curl, CURLOPT_PROXY, p.constData());
-			
+
 			int type;
 			if(proxy.nType == Proxy::ProxySocks5)
 				type = CURLPROXY_SOCKS5;
@@ -203,13 +203,13 @@ void CurlUpload::changeActive(bool nowActive)
 		}
 		else
 			curl_easy_setopt(m_curl, CURLOPT_PROXY, "");
-		
+
 		CurlPoller::instance()->addTransfer(this);
 	}
 	else
 	{
 		m_nDone = done();
-		
+
 		resetStatistics();
 		curl_easy_setopt(m_curl, CURLOPT_DEBUGFUNCTION, 0);
 		CurlPoller::instance()->removeTransfer(this, true);
@@ -232,7 +232,7 @@ int CurlUpload::curl_debug_callback(CURL*, curl_infotype type, char* text, size_
 		if(!line.isEmpty())
 			This->enterLogMessage(line);
 	}
-	
+
 	return 0;
 }
 
@@ -255,10 +255,10 @@ qulonglong CurlUpload::done() const
 		double totalBytes, doneBytes;
 		curl_easy_getinfo(m_curl, CURLINFO_CONTENT_LENGTH_UPLOAD, &totalBytes);
 		curl_easy_getinfo(m_curl, CURLINFO_SIZE_UPLOAD, &doneBytes);
-		
+
 		//qDebug() << "CURLINFO_CONTENT_LENGTH_UPLOAD" << totalBytes;
 		//qDebug() << "CURLINFO_SIZE_UPLOAD" << doneBytes;
-		
+
 		if(totalBytes)
 			return total() - totalBytes + doneBytes;
 		else
@@ -270,7 +270,7 @@ void CurlUpload::load(const QDomNode& map)
 {
 	QString source, target;
 	Transfer::load(map);
-	
+
 	source = getXMLProperty(map, "source");
 	target = getXMLProperty(map, "target");
 	m_strName = getXMLProperty(map, "name");
@@ -278,7 +278,7 @@ void CurlUpload::load(const QDomNode& map)
 	m_nDone = getXMLProperty(map, "done").toLongLong();
 	m_proxy = getXMLProperty(map, "proxy");
 	m_strBindAddress = getXMLProperty(map, "bindaddr");
-	
+
 	try
 	{
 		init(source, target);
@@ -293,7 +293,7 @@ void CurlUpload::load(const QDomNode& map)
 void CurlUpload::save(QDomDocument& doc, QDomNode& map) const
 {
 	Transfer::save(doc, map);
-	
+
 	setXMLProperty(doc, map, "source", m_strSource);
 	setXMLProperty(doc, map, "target", m_strTarget.toString());
 	setXMLProperty(doc, map, "name", m_strName);
@@ -320,7 +320,7 @@ void CurlUpload::transferDone(CURLcode result)
 {
 	if(!isActive())
 		return;
-	
+
 	if(result == CURLE_OK || done() == total())
 		setState(Completed);
 	else
@@ -328,7 +328,7 @@ void CurlUpload::transferDone(CURLcode result)
 		m_strMessage = m_errorBuffer;
 		if(result == CURLE_OPERATION_TIMEDOUT)
 			m_strMessage = tr("Timeout");
-		
+
 		setState(Failed);
 	}
 }
@@ -341,7 +341,7 @@ WidgetHostChild* CurlUpload::createOptionsWidget(QWidget* w)
 void CurlUpload::fillContextMenu(QMenu& menu)
 {
 	QAction* a;
-	
+
 	a = menu.addAction(tr("Compute hash..."));
 	connect(a, SIGNAL(triggered()), this, SLOT(computeHash()));
 }
@@ -365,7 +365,7 @@ FtpUploadOptsForm::FtpUploadOptsForm(QWidget* me, CurlUpload* myobj)
 	: m_upload(myobj)
 {
 	setupUi(me);
-	
+
 	if(myobj->m_strTarget.scheme() != "ftp")
 	{
 		//comboFtpMode->setDisabled(true);
@@ -377,26 +377,26 @@ void FtpUploadOptsForm::load()
 {
 	QList<Proxy> listProxy = Proxy::loadProxys();
 	QUrl temp, url;
-	
+
 	temp = url = m_upload->m_strTarget;
 	temp.setUserInfo(QString());
 	lineTarget->setText(temp.toString());
 	lineUsername->setText(url.userName());
 	linePassword->setText(url.password());
-	
+
 	comboFtpMode->addItems(QStringList(tr("Active mode")) << tr("Passive mode"));
 	comboFtpMode->setCurrentIndex(int(m_upload->m_mode));
-	
+
 	comboProxy->addItem(tr("(none)", "No proxy"));
 	comboProxy->setCurrentIndex(0);
-	
+
 	for(int i=0;i<listProxy.size();i++)
 	{
 		comboProxy->addItem(listProxy[i].strName);
 		if(listProxy[i].uuid == m_upload->m_proxy)
 			comboProxy->setCurrentIndex(i+1);
 	}
-	
+
 	lineAddrBind->setText(m_upload->m_strBindAddress);
 }
 
@@ -404,14 +404,14 @@ void FtpUploadOptsForm::accepted()
 {
 	QList<Proxy> listProxy = Proxy::loadProxys();
 	QUrl url = lineTarget->text();
-	
+
 	url.setUserName(lineUsername->text());
 	url.setPassword(linePassword->text());
-	
+
 	m_upload->m_strTarget = url.toString();
 	int ix = comboProxy->currentIndex();
 	m_upload->m_proxy = (!ix) ? QUuid() : listProxy[ix-1].uuid;
-	
+
 	m_upload->m_mode = FtpMode( comboFtpMode->currentIndex() );
 	m_upload->m_strBindAddress = lineAddrBind->text();
 }
@@ -419,10 +419,10 @@ void FtpUploadOptsForm::accepted()
 bool FtpUploadOptsForm::accept()
 {
 	bool acc = false;
-	
+
 	acc |= lineTarget->text().startsWith("ftp://");
 	acc |= lineTarget->text().startsWith("sftp://");
-	
+
 	return acc;
 }
 

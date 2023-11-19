@@ -42,10 +42,10 @@ DropBox::DropBox(QWidget* parent) : QWidget(parent)
 {
 	setWindowFlags(Qt::ToolTip);
 	setAcceptDrops(true);
-	
+
 	m_renderer = new QSvgRenderer(QString(":/svg/mousetrap.svg"), this);
 	move( g_settings->value("dropbox/position", QPoint(100,100)).toPoint() );
-	
+
 	reconfigure();
 }
 
@@ -53,16 +53,16 @@ void DropBox::reconfigure()
 {
 	int myheight = g_settings->value("dropbox/height", getSettingsDefault("dropbox/height")).toInt();
 	resize(myheight, myheight);
-	
+
 	m_buffer = QPixmap(size());
-	
+
 	QPainter p(&m_buffer);
 	p.setViewport(0, 0, width(), height());
 	p.eraseRect(0, 0, width(), height());
 	m_renderer->render(&p);
-	
+
 	setMask(m_buffer.createMaskFromColor(Qt::white));
-	
+
 	m_bUnhide = g_settings->value("dropbox/unhide", getSettingsDefault("dropbox/unhide")).toBool();
 }
 

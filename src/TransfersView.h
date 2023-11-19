@@ -48,34 +48,34 @@ protected:
 			QMimeData *data = model()->mimeData(indexes);
 			if(!data)
 				return;
-			
+
 			QRect rect;
 			QPixmap pixmap(100, 100);
 			QPainter painter;
 			QString text;
-			
+
 			pixmap.fill(Qt::transparent);
 			painter.begin(&pixmap);
-			
+
 			text = tr("%1 transfers").arg(indexes.size()/header()->count());
 			painter.drawText(rect, 0, text, &rect);
-			
+
 			rect.moveTo(5, 5);
 			QRect around = rect.adjusted(-5, -5, 5, 5);
 			painter.fillRect(around, Qt::white);
-			
+
 			painter.drawText(rect, 0, text, 0);
-			
+
 			painter.setPen(Qt::darkGray);
 			painter.drawRect(around);
-			
+
 			painter.end();
-			
+
 			QDrag *drag = new QDrag(this);
 			drag->setPixmap(pixmap);
 			drag->setMimeData(data);
 			drag->setHotSpot(QPoint(-20, -20));
-			
+
 			drag->exec(supportedActions);
 		}
 	}

@@ -32,7 +32,7 @@ ScheduledActionDlg::ScheduledActionDlg(QWidget* parent)
 	: QDialog(parent)
 {
 	setupUi(this);
-	
+
 	connect(radioRepeated, SIGNAL(clicked()), this, SLOT(switchPages()));
 	connect(radioOneTime, SIGNAL(clicked()), this, SLOT(switchPages()));
 
@@ -47,19 +47,19 @@ void ScheduledActionDlg::load()
 	{
 		comboQueue->addItem(g_queues[i]->name());
 		comboQueue->setItemData(i, g_queues[i]->uuid());
-		
+
 		if(g_queues[i]->uuid() == m_action.queue.toString())
 			comboQueue->setCurrentIndex(i);
 	}
 	g_queuesLock.unlock();
-	
+
 	lineName->setText(m_action.name);
 	timeEdit->setTime(m_action.whenRepeated);
 	dateTimeEdit->setDateTime(m_action.whenOneTime);
 	radioRepeated->setChecked(m_action.repeated);
 	radioOneTime->setChecked(!m_action.repeated);
 	comboAction->setCurrentIndex(int(m_action.action));
-	
+
 	for(int i=0;i<7;i++)
 		listWeekdays->item(i)->setCheckState(m_action.daysRepeated[i] ? Qt::Checked : Qt::Unchecked);
 
@@ -72,7 +72,7 @@ void ScheduledActionDlg::load()
 			lineUp->setText(QString::number(sp[1].toInt() / 1024));
 		}
 	}
-	
+
 	switchPages();
 }
 
@@ -96,7 +96,7 @@ void ScheduledActionDlg::save()
 		sp << lineUp->text().toInt() * 1024;
 		m_action.actionArgument = sp;
 	}
-	
+
 	for(int i=0;i<7;i++)
 		m_action.daysRepeated[i] = listWeekdays->item(i)->checkState() == Qt::Checked;
 }
@@ -114,11 +114,11 @@ void ScheduledActionDlg::accept()
 int ScheduledActionDlg::exec()
 {
 	load();
-	
+
 	int ret = QDialog::exec();
 	if(ret == QDialog::Accepted)
 		save();
-	
+
 	return ret;
 }
 

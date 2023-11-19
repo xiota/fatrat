@@ -49,9 +49,9 @@ Scheduler::~Scheduler()
 void Scheduler::loadActions(QList<ScheduledAction>& list)
 {
 	int num = g_settings->beginReadArray("scheduler/actions");
-	
+
 	list.clear();
-	
+
 	for(int i=0;i<num;i++)
 	{
 		ScheduledAction a;
@@ -63,13 +63,13 @@ void Scheduler::loadActions(QList<ScheduledAction>& list)
 		a.whenRepeated = QTime::fromString(g_settings->value("whenRepeated").toString(), Qt::ISODate);
 		a.repeated = g_settings->value("repeated").toBool();
 		a.actionArgument = g_settings->value("actionArgument");
-		
+
 		QString days = g_settings->value("daysRepeated").toString();
 		for(int i=0;i<7;i++)
 			a.daysRepeated[i] = days[i] == '1';
 		list << a;
 	}
-	
+
 	g_settings->endArray();
 }
 
@@ -77,11 +77,11 @@ void Scheduler::saveActions(const QList<ScheduledAction>& items)
 {
 	g_settings->remove("scheduler/actions");
 	g_settings->beginWriteArray("scheduler/actions", items.size());
-	
+
 	for(int i=0;i<items.size();i++)
 	{
 		const ScheduledAction& a = items[i];
-		
+
 		g_settings->setArrayIndex(i);
 		g_settings->setValue("name", a.name);
 		g_settings->setValue("queueUUID", a.queue.toString());
@@ -90,15 +90,15 @@ void Scheduler::saveActions(const QList<ScheduledAction>& items)
 		g_settings->setValue("whenRepeated", a.whenRepeated.toString(Qt::ISODate));
 		g_settings->setValue("repeated", a.repeated);
 		g_settings->setValue("actionArgument", a.actionArgument);
-		
+
 		char days[8];
 		for(int i=0;i<7;i++)
 			days[i] = a.daysRepeated[i] ? '1' : '0';
 		days[7] = 0;
-		
+
 		g_settings->setValue("daysRepeated", days);
 	}
-	
+
 	g_settings->endArray();
 }
 

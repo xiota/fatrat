@@ -41,7 +41,7 @@ public:
 	void mousePressEvent(QMouseEvent* event);
 	//void mouseReleaseEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
-	
+
 	static InfoBar* getInfoBar(Transfer* d);
 	static void removeAll();
 public slots:

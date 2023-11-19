@@ -45,7 +45,7 @@ public:
 	{
 		qDeleteAll(m_children);
 	}
-	
+
 	QWidget* getChildHost()
 	{
 		return widgetGeneric;
@@ -55,7 +55,7 @@ public:
 		//setWindowTitle(child->windowTitle());
 		m_children << child;
 	}
-	
+
 	QWidget* getNextChildHost(QString label)
 	{
 		QWidget* sub = new QWidget(m_tabs);
@@ -67,27 +67,27 @@ public:
 	{
 		m_tabs->removeTab(m_tabs->indexOf(w));
 	}
-	
+
 	virtual void accept()
 	{
 		bool accepted = true, acc;
-		
+
 		foreach(WidgetHostChild* w,m_children)
 		{
 			acc = w->accept();
 			accepted = accepted && acc;
-			
+
 			if(!accepted)
 				break;
 		}
-		
+
 		if(accepted)
 		{
 			foreach(WidgetHostChild* w,m_children)
 			{
 				w->accepted();
 			}
-			
+
 			QDialog::accept();
 		}
 	}

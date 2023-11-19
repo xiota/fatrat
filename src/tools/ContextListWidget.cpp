@@ -53,10 +53,10 @@ ContextListWidget::ContextListWidget(QWidget* parent)
 
 	action = m_menu.addAction(tr("Add"));
 	connect(action, SIGNAL(triggered()), this, SLOT(addItem()));
-	
+
 	action = m_menu.addAction(tr("Edit"));
 	connect(action, SIGNAL(triggered()), this, SLOT(editItem()));
-	
+
 	action = m_menu.addAction(tr("Delete"));
 	connect(action, SIGNAL(triggered()), this, SLOT(deleteItem()));
 }

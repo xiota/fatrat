@@ -55,7 +55,7 @@ struct RssRegexp
 	QRegularExpression linkRegexp;
 	int queueIndex;
 	bool excludeManuals, includeTrailers, includeRepacks, addPaused;
-	
+
 	enum TVSType { None = 0, SeasonBased, EpisodeBased, DateBased } tvs;
 };
 
@@ -66,26 +66,26 @@ public:
 	RssFetcher();
 	~RssFetcher();
 	static RssFetcher* instance() { return m_instance; }
-	
+
 	bool startElement(const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts);
 	bool endElement(const QString& namespaceURI, const QString& localName, const QString& qName);
 	bool characters(const QString& ch);
 	void processItems();
-	
+
 	void applySettings();
 	void enable(bool bEnable);
-	
+
 	static void processItem(QList<RssRegexp>& regexps, const RssItem& item);
-	
+
 	static void performManualCheck(QString torrentName);
-	
+
 	static void updateRegexpQueues(QList<RssRegexp>& items); // g_queuesLock ought to be locked
 	static void loadRegexps(QList<RssRegexp>& items);
 	static void loadFeeds(QList<RssFeed>& items);
-	
+
 	static void saveRegexps(const QList<RssRegexp>& items);
 	static void saveFeeds(const QList<RssFeed>& items);
-	
+
 	static QString generateEpisodeName(const RssRegexp& match, QString itemName);
 	static void dayMonthHeuristics(int& day, int& month);
 public slots:
@@ -93,12 +93,12 @@ public slots:
 	void requestFinished(QNetworkReply*);
 private:
 	static RssFetcher* m_instance;
-	
+
 	QTimer m_timer;
 	QList<RssFeed> m_feeds;
 	QList<RssItem> m_items;
 	bool m_bAllOK;
-	
+
 	// XML parsing
 	bool m_bInItem;
 	RssItem m_itemNext;

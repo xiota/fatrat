@@ -39,11 +39,11 @@ class TorrentOptsWidget : public QObject, public WidgetHostChild, Ui_TorrentOpts
 Q_OBJECT
 public:
 	TorrentOptsWidget(QWidget* me, TorrentDownload* parent);
-	
+
 	virtual void load();
 	virtual void accepted();
 	void startInvalid();
-	
+
 	static void recursiveCheck(QTreeWidgetItem* item, Qt::CheckState state);
 	static void recursiveUpdate(QTreeWidgetItem* item);
 	static qint64 recursiveUpdateDown(QTreeWidgetItem* item);
@@ -52,7 +52,7 @@ public slots:
 	void addTracker();
 	void removeTracker();
 	void handleInvalid();
-	
+
 	void fileItemChanged(QTreeWidgetItem* item, int column);
 private:
 	TorrentDownload* m_download;

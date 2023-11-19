@@ -51,7 +51,7 @@ class TorrentFilesModel : public QAbstractListModel
 Q_OBJECT
 public:
 	TorrentFilesModel(QObject* parent, TorrentDownload* d);
-	
+
 	QModelIndex index(int row, int column, const QModelIndex& parent) const;
 	QModelIndex parent(const QModelIndex &index) const;
 	int rowCount(const QModelIndex &parent) const;
@@ -59,7 +59,7 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	bool hasChildren(const QModelIndex& parent) const;
-	
+
 	void refresh(const libtorrent::bitfield* pieces);
 protected:
 	std::vector<int64_t> m_progresses;
@@ -67,7 +67,7 @@ protected:
 private:
 	TorrentDownload* m_download;
 	QStringList m_columns;
-	
+
 	friend class TorrentProgressDelegate;
 };
 

@@ -127,18 +127,18 @@ int main(int argc,char** argv)
 	QCoreApplication* app = 0;
 	int rval;
 	QString arg;
-	
+
 	QCoreApplication::setOrganizationName("Dolezel");
 	QCoreApplication::setOrganizationDomain("dolezel.info");
 	QCoreApplication::setApplicationName("fatrat");
-	
+
 	arg = argsToArg(argc, argv);
 
 	if (!m_strPidFile.isEmpty())
 		writePidFile();
 	if (!m_strSetUser.isEmpty())
 		dropPrivileges();
-	
+
 	if (m_bStartGUI)
 		app = new MyApplication(argc, argv);
 	else
@@ -149,14 +149,14 @@ int main(int argc,char** argv)
 
 	if(!m_bForceNewInstance)
 		processSession(arg);
-    
-    
+
+
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 	SSL_library_init();
 #else
 	OPENSSL_init_ssl(0, NULL);
 #endif
-	
+
 #ifdef WITH_NLS
 	QTranslator translator;
 	{
@@ -166,10 +166,10 @@ int main(int argc,char** argv)
 		QCoreApplication::installTranslator(&translator);
 	}
 #endif
-	
+
 	// Init download engines (let them load settings)
 	initSettingsDefaults(m_strSettingsPath);
-	
+
 	if(m_bStartGUI)
 		initSettingsPages();
 
@@ -187,7 +187,7 @@ int main(int argc,char** argv)
 		}
 	}
 #endif
-	
+
 	installSignalHandler();
 	initTransferClasses();
 	loadPlugins();
@@ -203,46 +203,46 @@ int main(int argc,char** argv)
 
 	// force singleton creation
 	TransferFactory::instance();
-	
+
 	g_qmgr = new QueueMgr;
 
 #ifdef WITH_WEBINTERFACE
 	XmlRpcService::globalInit();
 	new HttpService;
 #endif
-	
+
 	if(m_bStartGUI)
 		g_wndMain = new MainWindow(m_bStartHidden);
 	else
 		qDebug() << "FatRat is up and running now";
-	
+
 	new RssFetcher;
-	
+
 	initDbus();
 
 	//testNotif();
-	
+
 	if(!arg.isEmpty() && m_bStartGUI)
 		g_wndMain->addTransfer(arg);
-	
+
 	new Scheduler;
-	
+
 	if(m_bStartGUI)
 		QApplication::setQuitOnLastWindowClosed(false);
 	rval = app->exec();
-	
+
 #ifdef WITH_WEBINTERFACE
 	delete HttpService::instance();
 #endif
 	delete RssFetcher::instance();
 	delete Scheduler::instance();
 	delete g_wndMain;
-	
+
 	g_qmgr->exit();
 	Queue::stopQueues();
 	Queue::saveQueues();
 	Queue::unloadQueues();
-	
+
 	runEngines(false);
 
 #ifdef WITH_JPLUGINS
@@ -253,11 +253,11 @@ int main(int argc,char** argv)
 		FileSharingSearch::globalExit();
 	}
 #endif
-	
+
 	delete g_qmgr;
 	exitSettings();
 	delete app;
-	
+
 	return rval;
 }
 
@@ -267,7 +267,7 @@ QString argsToArg(int argc,char** argv)
 
 	if (prg == "fatrat-nogui" || prg.endsWith("/fatrat-nogui"))
 		m_bStartGUI = false;
-	
+
 	for(int i=1;i<argc;i++)
 	{
 		if(!strcasecmp(argv[i], "--force") || !strcasecmp(argv[i], "-f"))
@@ -312,7 +312,7 @@ QString argsToArg(int argc,char** argv)
 			arg += argv[i];
 		}
 	}
-	
+
 	return arg;
 }
 
@@ -320,16 +320,16 @@ void processSession(QString arg)
 {
 	QDBusConnection conn = QDBusConnection::sessionBus();
 	QDBusConnectionInterface* bus = conn.interface();
-	
+
 	if(bus->isServiceRegistered("info.dolezel.fatrat"))
 	{
 		qDebug() << "FatRat is already running";
-		
+
 		if(!arg.isEmpty())
 		{
 			qDebug() << "Passing arguments to an existing instance.";
 			QDBusInterface iface("info.dolezel.fatrat", "/", "info.dolezel.fatrat", conn);
-			
+
 			iface.call("addTransfers", arg);
 		}
 		else
@@ -337,7 +337,7 @@ void processSession(QString arg)
 			QMessageBox::critical(0, "FatRat", QObject::tr("There is already a running instance.\n"
 					"If you want to start FatRat anyway, pass --force among arguments."));
 		}
-		
+
 		exit(0);
 	}
 }
@@ -357,7 +357,7 @@ static void runEngines(bool init)
 				g_enginesDownload[i].lpfnExit();
 		}
 	}
-	
+
 	for(int i=0;i<g_enginesUpload.size();i++)
 	{
 		if(init)
@@ -381,7 +381,7 @@ QWidget* getMainWindow()
 QString formatSize(qulonglong size, bool persec)
 {
 	QString rval;
-	
+
 	if(size < 1024)
 		rval = QString("%L1 B").arg(size);
 	else if(size < 1024*1024)
@@ -390,7 +390,7 @@ QString formatSize(qulonglong size, bool persec)
 		rval = QString("%L1 MB").arg(double(size)/1024.0/1024.0, 0, 'f', 1);
 	else
 		rval = QString("%L1 GB").arg(double(size)/1024.0/1024.0/1024.0, 0, 'f', 1);
-	
+
 	if(persec) rval += "/s";
 	return rval;
 }
@@ -401,13 +401,13 @@ QString formatTime(qulonglong inval)
 	qulonglong days,hrs,mins,secs;
 	days = inval/(60*60*24);
 	inval %= 60*60*24;
-	
+
 	hrs = inval/(60*60);
 	inval %= 60*60;
-	
+
 	mins = inval/60;
 	secs = inval%60;
-	
+
 	if(days)
 		result = QString("%1d ").arg(days);
 	if(hrs)
@@ -416,7 +416,7 @@ QString formatTime(qulonglong inval)
 		result += QString("%1m ").arg(mins);
 	if(secs)
 		result += QString("%1s").arg(secs);
-	
+
 	return result;
 }
 
@@ -448,10 +448,10 @@ public:
 				qDebug() << "Not a directory:" << what;
 				return false;
 			}
-			
+
 			QStringList contents;
 			contents = dir.entryList();
-			
+
 			foreach(QString item, contents)
 			{
 				if(item != "." && item != "..")
@@ -460,7 +460,7 @@ public:
 						return false;
 				}
 			}
-			
+
 			QString name = dir.dirName();
 			if(!dir.cdUp())
 			{
@@ -488,7 +488,7 @@ bool openDataFile(QFile* file, QString filePath)
 {
 	if(filePath[0] != '/')
 		filePath.prepend('/');
-	
+
 	file->setFileName(QDir::homePath() + QLatin1String(USER_PROFILE_PATH) + filePath);
 	if(file->open(QIODevice::ReadOnly))
 		return true;
@@ -506,7 +506,7 @@ QString getDataFileDir(QString dir, QString fileName)
 {
 	if(fileName.isEmpty())
 		return QLatin1String(DATA_LOCATION) + dir;
-	
+
 	QString f = QDir::homePath() + QLatin1String(USER_PROFILE_PATH) + dir;
 	if(fileName[0] != '/')
 		fileName.prepend('/');
@@ -541,7 +541,7 @@ QStringList listDataDir(QString path)
 void loadPlugins()
 {
 	loadPlugins(PLUGIN_LOCATION);
-	
+
 	if(const char* p = getenv("PLUGIN_PATH"))
 		loadPlugins(p);
 }
@@ -550,7 +550,7 @@ void loadPlugins(const char* p)
 {
 	QDir dir(p);
 	QStringList plugins = dir.entryList(QStringList("*.so"));
-	
+
 	foreach(QString pl, plugins)
 	{
 		QByteArray p = dir.filePath(pl).toUtf8();
@@ -558,13 +558,13 @@ void loadPlugins(const char* p)
 		if(void* l = dlopen(p.constData(), RTLD_NOW))
 		{
 			Logger::global()->enterLogMessage(QObject::tr("Loaded a plugin:") + ' ' + pl);
-			
+
 			PluginInfo (*info)() = (PluginInfo(*)()) dlsym(l, "getInfo");
 			if(info != 0)
 			{
 				PluginInfo i = info();
 				g_plugins[pl] = i;
-				
+
 				if(strcmp(i.version, VERSION))
 				{
 					qDebug() << "WARNING! Version conflict." << pl << "is" << i.version << "but FatRat is" << VERSION;
@@ -616,7 +616,7 @@ static void terminateHandler(int s)
 void installSignalHandler()
 {
 	struct sigaction act;
-	
+
 	memset(&act, 0, sizeof(act));
 
 	act.sa_handler = terminateHandler;
@@ -697,7 +697,7 @@ void writePidFile()
 		std::cerr << "Cannot write the pid file\n";
 		exit(errno);
 	}
-	
+
 	file.write(QByteArray::number(getpid()));
 }
 

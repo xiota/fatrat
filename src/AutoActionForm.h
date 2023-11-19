@@ -37,12 +37,12 @@ public:
 	{
 		setupUi(me);
 	}
-	
+
 	virtual void load()
 	{
 		lineCommandCompleted->setText(m_transfer->autoActionCommand(Transfer::Completed));
 	}
-	
+
 	virtual void accepted()
 	{
 		m_transfer->setAutoActionCommand(Transfer::Completed, lineCommandCompleted->text());

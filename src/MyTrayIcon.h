@@ -40,12 +40,12 @@ public:
 		if (!desktop || strcmp(desktop, "Unity") != 0)
 			m_tip = new TrayToolTip;
 	}
-	
+
 	~MyTrayIcon()
 	{
 		delete m_tip;
 	}
-	
+
 	bool event(QEvent* e)
 	{
 		if (m_tip && e->type() == QEvent::ToolTip)

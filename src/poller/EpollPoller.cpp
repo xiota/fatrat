@@ -55,7 +55,7 @@ int EpollPoller::addSocket(int socket, int flags)
 	epoll_event event;
 	event.events = 0;
 	event.data.fd = socket;
-	
+
 	if(flags & PollerIn)
 		event.events |= EPOLLIN;
 	if(flags & PollerOut)
@@ -64,7 +64,7 @@ int EpollPoller::addSocket(int socket, int flags)
 		event.events |= EPOLLONESHOT;
 	if(flags & PollerHup)
 		event.events |= EPOLLHUP;
-	
+
 	if(epoll_ctl(m_epoll, EPOLL_CTL_MOD, socket, &event))
 	{
 		if(errno == ENOENT)
@@ -75,7 +75,7 @@ int EpollPoller::addSocket(int socket, int flags)
 		else
 			return errno;
 	}
-	
+
 	return 0;
 }
 
@@ -89,15 +89,15 @@ int EpollPoller::wait(int msec, Event* xev, int max)
 {
 	epoll_event* events = (epoll_event*) alloca(sizeof(epoll_event) * max);
 	int nfds;
-	
+
 	nfds = epoll_wait(m_epoll, events, max, msec);
-	
+
 	for(int i=0;i<nfds;i++)
 	{
 		Event& ev = xev[i];
 		ev.socket = events[i].data.fd;
 		ev.flags = 0;
-		
+
 		if(events[i].events & EPOLLIN)
 			ev.flags |= PollerIn;
 		if(events[i].events & EPOLLOUT)
@@ -107,6 +107,6 @@ int EpollPoller::wait(int msec, Event* xev, int max)
 		if(events[i].events & EPOLLHUP)
 			ev.flags |= PollerHup;
 	}
-	
+
 	return nfds;
 }

@@ -66,7 +66,7 @@ public:
 	~HttpService();
 	static HttpService* instance() { return m_instance; }
 	void applySettings();
-	
+
 	void setup();
 	void setupAuth();
 	void setupSSL();

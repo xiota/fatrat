@@ -203,7 +203,7 @@ void JavaDownload::setState(State newState)
 		try
 		{
 			m_plugin->call("finalCheck", JSignature().addString(), JArgs() << dataPath(true));
-			
+
 			if (m_state != Failed)
 				Transfer::setState(Completed);
 			else

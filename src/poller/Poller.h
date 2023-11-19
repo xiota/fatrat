@@ -33,17 +33,17 @@ class Poller : public QObject
 {
 public:
 	static Poller* createInstance(QObject* parent = 0);
-	
+
 	enum Flags { PollerIn = 1, PollerOut = 2, PollerError = 4, PollerHup = 8, PollerOneShot = 16 };
-	
+
 	struct Event
 	{
 		int socket;
 		int flags;
 	};
-	
+
 	virtual int handle() = 0;
-	
+
 	// Should perform modify if the socket is already in the set
 	// provided that the underlying subsystem requires that.
 	virtual int addSocket(int socket, int flags) = 0;

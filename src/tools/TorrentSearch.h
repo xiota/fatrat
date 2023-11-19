@@ -47,20 +47,20 @@ protected:
 		QString regexp;
 		int field, match;
 	};
-	
+
 	struct Engine
 	{
 		QString id, name;
 		QString query, postData;
-		
+
 		// parsing blocks
 		QString beginning, splitter, ending;
-		
+
 		// parsing items
 		QMap<QString,RegExpParam> regexps;
 
 		QMap<QString,QString> formats;
-		
+
 		QNetworkReply* reply;
 
 		bool operator<(const Engine& e) const
@@ -68,13 +68,13 @@ protected:
 			return this->name < e.name;
 		}
 	};
-	
+
 	void updateUi();
 	void loadEngines();
 	void loadEngines(QString path);
 	void parseResults(Engine* e, const QByteArray& data);
 	QString completeUrl(QString url, QString complete);
-	
+
 	static QList<QByteArray> splitArray(const QByteArray& src, QString sep);
 signals:
 	void changeTabTitle(QString newTitle);
@@ -96,9 +96,9 @@ class SearchTreeWidgetItem : public QTreeWidgetItem
 {
 public:
 	SearchTreeWidgetItem(QTreeWidget* parent) : QTreeWidgetItem(parent) {}
-	
+
 	void parseSize(QString in);
-	
+
 	QString m_strLink; // torrent download link
 	QString m_strInfo; // info URL
 	qint64 m_nSize; // torrent's data size

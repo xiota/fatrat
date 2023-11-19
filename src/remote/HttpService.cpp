@@ -81,7 +81,7 @@ HttpService::HttpService()
 {
 	m_instance = this;
 	applySettings();
-	
+
 	SettingsItem si;
 	si.lpfnCreate = SettingsWebForm::create;
 	si.title = tr("Web Interface");
@@ -89,7 +89,7 @@ HttpService::HttpService()
 	si.pfnApply = SettingsWebForm::applySettings;
 	si.webSettingsScript = "/scripts/settings/webinterface.js";
 	si.webSettingsIconURL = "/img/settings/webinterface.png";
-	
+
 	addSettingsPage(si);
 
 	addHandler(QRegularExpression("/xmlrpc"), std::bind(&XmlRpcService::createHandler, &m_xmlRpc));
@@ -192,7 +192,7 @@ void HttpService::setupAuth()
 void HttpService::setup()
 {
 	m_port = getSettingsValue("remote/port").toUInt();
-	
+
 	try
 	{
 		HTTPServerParams* params = new HTTPServerParams;
@@ -550,7 +550,7 @@ int HttpService::findTransfer(QString transferUUID, Queue** q, Transfer** t, boo
 {
 	*q = 0;
 	*t = 0;
-	
+
 	g_queuesLock.lockForRead();
 	for(int i=0;i<g_queues.size();i++)
 	{
@@ -559,7 +559,7 @@ int HttpService::findTransfer(QString transferUUID, Queue** q, Transfer** t, boo
 			c->lockW();
 		else
 			c->lock();
-		
+
 		for(int j=0;j<c->size();j++)
 		{
 			if(c->at(j)->uuid() == transferUUID)
@@ -569,7 +569,7 @@ int HttpService::findTransfer(QString transferUUID, Queue** q, Transfer** t, boo
 				return j;
 			}
 		}
-		
+
 		c->unlock();
 	}
 

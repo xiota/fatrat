@@ -46,21 +46,21 @@ public:
 		setupUi(parent);
 		connect(toolBrowse, SIGNAL(pressed()), this, SLOT(browse()));
 	}
-	
+
 	virtual ~GenericOptsForm()
 	{
 	}
-	
+
 	virtual void load()
 	{
 		lineURI->setText(m_strURI);
 		spinDown->setValue(m_nDownLimit);
 		spinUp->setValue(m_nUpLimit);
-		
+
 		if(m_mode == Transfer::Upload)
 			labelURI->setText(tr("Source:"));
 	}
-	
+
 	virtual bool accept()
 	{
 		if(m_mode == Transfer::Download)
@@ -74,7 +74,7 @@ public:
 			return file.isReadable();
 		}
 	}
-	
+
 	virtual void accepted()
 	{
 		m_strURI = lineURI->text();
@@ -85,7 +85,7 @@ public slots:
 	void browse()
 	{
 		QString uri;
-		
+
 		if(m_mode == Transfer::Upload)
 			uri = QFileDialog::getOpenFileName(m_parent->parentWidget(), tr("Choose file"), lineURI->text());
 		else

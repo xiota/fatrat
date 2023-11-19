@@ -69,7 +69,7 @@ QVariant TorrentPiecesModel::data(const QModelIndex &index, int role) const
 		if(index.row() >= (int) m_pieces.size())
 			return QVariant();
 		const libtorrent::partial_piece_info& info = m_pieces[index.row()];
-		
+
 		switch(index.column())
 		{
 		case 0:
@@ -99,14 +99,14 @@ bool TorrentPiecesModel::hasChildren(const QModelIndex & parent) const
 void TorrentPiecesModel::refresh()
 {
 	int count = 0;
-	
+
 	if(m_download->m_handle.is_valid())
 	{
 		m_pieces.clear();
 		m_download->m_handle.get_download_queue(m_pieces);
 		count = m_pieces.size();
 	}
-	
+
 	if(count > m_nLastRowCount)
 	{
 		beginInsertRows(QModelIndex(), m_nLastRowCount, count-1);
@@ -118,7 +118,7 @@ void TorrentPiecesModel::refresh()
 		endRemoveRows();
 	}
 	m_nLastRowCount = count;
-	
+
 	dataChanged(createIndex(0,0), createIndex(count, m_columns.size())); // refresh the view
 }
 
@@ -128,28 +128,28 @@ void BlockDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 	{
 		TorrentPiecesModel* model = (TorrentPiecesModel*) index.internalPointer();
 		const libtorrent::partial_piece_info& piece = model->m_pieces[index.row()];
-		
+
 		QRect myrect = option.rect;
-		
+
 		myrect.setWidth(myrect.width()-1);
 		//myrect.setHeight(myrect.height()-1);
-		
+
 		float bwidth = myrect.width() / float(piece.blocks_in_piece);
 		for(int i=0;i<piece.blocks_in_piece;)
 		{
 			int from = i, to;
 			const int state = piece.blocks[i].state;
-			
+
 			do
 				to = i++;
 			while(i<piece.blocks_in_piece && state == piece.blocks[i].state);
-			
+
 			if(state == libtorrent::block_info::finished)
 				painter->fillRect(myrect.x()+from*bwidth, myrect.y(), ceilf(bwidth*(to-from+1)), myrect.height(), QColor(128,128,255));
 			else if(state == libtorrent::block_info::requested)
 				painter->fillRect(myrect.x()+from*bwidth, myrect.y(), ceilf(bwidth*(to-from+1)), myrect.height(), Qt::gray);
 		}
-		
+
 		painter->setPen(Qt::black);
 		painter->drawRect(myrect);
 	}

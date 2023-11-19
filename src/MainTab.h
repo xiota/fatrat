@@ -48,7 +48,7 @@ protected:
 	void initAppTools(QMenu* tabOpenMenu);
 	void contextMenuEvent(QContextMenuEvent* event);
 	void mousePressEvent(QMouseEvent* event);
-	
+
 	int m_index;
 	int m_lastIndex, m_lastIndexCur;
 	QToolButton* m_toolTabClose;

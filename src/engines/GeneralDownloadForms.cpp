@@ -31,7 +31,7 @@ respects for all of the code used other than "OpenSSL".
 HttpOptsWidget::HttpOptsWidget(QWidget* me,CurlDownload* myobj) : QObject(me), m_download(myobj)
 {
 	setupUi(me);
-	
+
 	connect(pushUrlAdd, SIGNAL(clicked()), this, SLOT(addUrl()));
 	connect(pushUrlEdit, SIGNAL(clicked()), this, SLOT(editUrl()));
 	connect(pushUrlDelete, SIGNAL(clicked()), this, SLOT(deleteUrl()));
@@ -40,13 +40,13 @@ HttpOptsWidget::HttpOptsWidget(QWidget* me,CurlDownload* myobj) : QObject(me), m
 void HttpOptsWidget::load()
 {
 	lineFileName->setText(m_download->m_strFile);
-	
+
 	m_urls = m_download->m_urls;
 	foreach(UrlClient::UrlObject obj,m_urls)
 	{
 		QUrl copy = obj.url;
 		copy.setUserInfo(QString());
-		
+
 		listUrls->addItem(copy.toString());
 	}
 }
@@ -59,7 +59,7 @@ bool HttpOptsWidget::accept()
 void HttpOptsWidget::accepted()
 {
 	QString newFileName = lineFileName->text();
-	
+
 	if(newFileName != m_download->m_strFile)
 	{
 		m_download->setTargetName(newFileName);
@@ -121,18 +121,18 @@ void HttpOptsWidget::accepted()
 			break;
 		}
 	}
-	
+
 	//m_download->m_urls = m_urls;
 }
 
 void HttpOptsWidget::addUrl()
 {
 	HttpUrlOptsDlg dlg((QWidget*) parent());
-	
+
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		UrlClient::UrlObject obj;
-		
+
 		obj.url = dlg.m_strURL;
 		obj.url.setUserName(dlg.m_strUser);
 		obj.url.setPassword(dlg.m_strPassword);
@@ -140,7 +140,7 @@ void HttpOptsWidget::addUrl()
 		obj.ftpMode = dlg.m_ftpMode;
 		obj.proxy = dlg.m_proxy;
 		obj.strBindAddress = dlg.m_strBindAddress;
-		
+
 		listUrls->addItem(dlg.m_strURL);
 		m_urls << obj;
 
@@ -155,12 +155,12 @@ void HttpOptsWidget::editUrl()
 {
 	int row = listUrls->currentRow();
 	HttpUrlOptsDlg dlg((QWidget*) parent());
-	
+
 	if(row < 0)
 		return;
-	
+
 	UrlClient::UrlObject& obj = m_urls[row];
-	
+
 	QUrl temp = obj.url;
 	temp.setUserInfo(QString());
 	dlg.m_strURL = temp.toString();
@@ -170,7 +170,7 @@ void HttpOptsWidget::editUrl()
 	dlg.m_ftpMode = obj.ftpMode;
 	dlg.m_proxy = obj.proxy;
 	dlg.m_strBindAddress = obj.strBindAddress;
-	
+
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		obj.url = dlg.m_strURL;
@@ -186,7 +186,7 @@ void HttpOptsWidget::editUrl()
 		op.object = obj;
 		op.index = row;
 		m_operations << op;
-		
+
 		listUrls->item(row)->setText(dlg.m_strURL);
 	}
 }
@@ -194,7 +194,7 @@ void HttpOptsWidget::editUrl()
 void HttpOptsWidget::deleteUrl()
 {
 	int row = listUrls->currentRow();
-	
+
 	if(row >= 0)
 	{
 		delete listUrls->takeItem(row);
@@ -213,7 +213,7 @@ HttpUrlOptsDlg::HttpUrlOptsDlg(QWidget* parent, QList<Transfer*>* multi)
 	: QDialog(parent), m_ftpMode(UrlClient::FtpActive), m_multi(multi)
 {
 	setupUi(this);
-	
+
 	if(m_multi != 0)
 	{
 		lineUrl->setVisible(false);
@@ -224,24 +224,24 @@ HttpUrlOptsDlg::HttpUrlOptsDlg(QWidget* parent, QList<Transfer*>* multi)
 void HttpUrlOptsDlg::init()
 {
 	QList<Proxy> listProxy = Proxy::loadProxys();
-	
+
 	comboFtpMode->addItems(QStringList(tr("Active mode")) << tr("Passive mode"));
 	comboFtpMode->setCurrentIndex(int(m_ftpMode));
-	
+
 	lineUrl->setText(m_strURL);
 	lineReferrer->setText(m_strReferrer);
 	lineUsername->setText(m_strUser);
 	linePassword->setText(m_strPassword);
 	lineAddrBind->setText(m_strBindAddress);
-	
+
 	comboProxy->addItem(tr("(none)", "No proxy"));
 	comboProxy->setCurrentIndex(0);
-	
+
 	if(m_proxy.isNull() && m_multi != 0)
 	{
 		m_proxy = getSettingsValue("httpftp/defaultproxy").toString();
 	}
-	
+
 	for(int i=0;i<listProxy.size();i++)
 	{
 		comboProxy->addItem(listProxy[i].strName);
@@ -254,34 +254,34 @@ int HttpUrlOptsDlg::exec()
 {
 	int result;
 	init();
-	
+
 	result = QDialog::exec();
-	
+
 	if(result == QDialog::Accepted)
 	{
 		QList<Proxy> listProxy = Proxy::loadProxys();
-		
+
 		m_strURL = lineUrl->text();
 		m_strReferrer = lineReferrer->text();
 		m_strUser = lineUsername->text();
 		m_strPassword = linePassword->text();
 		m_strBindAddress = lineAddrBind->text();
 		m_ftpMode = UrlClient::FtpMode( comboFtpMode->currentIndex() );
-		
+
 		int ix = comboProxy->currentIndex();
 		m_proxy = (!ix) ? QUuid() : listProxy[ix-1].uuid;
-		
+
 		if(m_multi != 0)
 			runMultiUpdate();
 	}
-	
+
 	return result;
 }
 
 void HttpUrlOptsDlg::accept()
 {
 	QString url = lineUrl->text();
-	
+
 	if(m_multi != 0 || url.startsWith("http://") || url.startsWith("ftp://")
 #ifdef WITH_SFTP
 		  || url.startsWith("sftp://")
@@ -301,7 +301,7 @@ void HttpUrlOptsDlg::runMultiUpdate()
 			obj.url.setUserName(m_strUser);
 			obj.url.setPassword(m_strPassword);
 		}
-		
+
 		obj.strReferrer = m_strReferrer;
 		obj.ftpMode = m_ftpMode;
 		obj.proxy = m_proxy;

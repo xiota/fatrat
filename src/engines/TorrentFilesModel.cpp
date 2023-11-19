@@ -69,14 +69,14 @@ QVariant TorrentFilesModel::headerData(int section, Qt::Orientation orientation,
 QVariant TorrentFilesModel::data(const QModelIndex &index, int role) const
 {
 	int i = index.row();
-	
+
 	if (!m_download->m_info)
 		return QVariant();
 
 	auto files = m_download->m_info->files();
 	if (i >= files.num_files())
 		return QVariant();
-		
+
 	if(role == Qt::DisplayRole)
 	{
 		switch(index.column())
@@ -85,10 +85,10 @@ QVariant TorrentFilesModel::data(const QModelIndex &index, int role) const
 			{
 				QString name = QString::fromStdString(m_download->m_info->files().file_path(i));
 				int p = name.indexOf('/');
-				
+
 				if(p != -1)
 					name = QLatin1String("[...]") + name.mid(p);
-				
+
 				return name;
 			}
 			case 1:
@@ -125,11 +125,11 @@ bool TorrentFilesModel::hasChildren(const QModelIndex& parent) const
 void TorrentFilesModel::refresh(const libtorrent::bitfield* pieces)
 {
 	m_pieces = pieces;
-	
+
 	if(m_download->m_handle.is_valid())
 		m_download->m_handle.file_progress(m_progresses);
 	int count = 0;
-	
+
 	if (m_download->m_info)
 		count = m_download->m_info->files().num_files();
 
@@ -139,35 +139,35 @@ void TorrentFilesModel::refresh(const libtorrent::bitfield* pieces)
 void TorrentProgressDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	TorrentFilesModel* model = (TorrentFilesModel*) index.internalPointer();
-	
+
 	if(index.column() == 4 && model->m_pieces && model->m_download)
 	{
 		int row = index.row();
 		QRect myrect = option.rect;
-		
+
 		myrect.setWidth(myrect.width()-1);
-		
+
 		quint32* buf = new quint32[myrect.width()];
 		auto files = model->m_download->m_info->files();
-		
+
 		const auto offset = files.file_offset(row);
 		const auto size = files.file_size(row);
 		int piece_size = model->m_download->m_info->piece_length();
-		
+
 		QImage im;
 		float sstart,send;
-		
+
 		sstart = (offset % piece_size) / float(piece_size);
 		send = 1.0f - ((offset + size) % piece_size) / float(piece_size);
-		
+
 		int start = offset/piece_size;
 		int end = ceilf( (offset+size)/float(piece_size) );
-		
+
 		const int allocated = (end-start+7)/8;
 		char* cpy = new char[allocated];
 		const char* src = model->m_pieces->data();
 		const int shift = start % 8;
-		
+
 		if(shift)
 		{
 			for(int i = 0; i < allocated; i++)
@@ -181,15 +181,15 @@ void TorrentProgressDelegate::paint(QPainter* painter, const QStyleOptionViewIte
 		{
 			memcpy(cpy, src + start/8, allocated);
 		}
-		
+
 		im = TorrentProgressWidget::generate(libtorrent::bitfield(cpy, end-start), myrect.width(), buf , sstart, send);
-		
+
 		delete [] cpy;
-		
+
 		painter->drawImage(option.rect, im);
 		painter->setPen(Qt::black);
 		painter->drawRect(myrect);
-		
+
 		delete [] buf;
 	}
 	else

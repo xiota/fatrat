@@ -43,13 +43,13 @@ public:
 	{
 		setupUi(me);
 	}
-	
+
 	virtual void load()
 	{
 		checkUnhide->setChecked( getSettingsValue("dropbox/unhide").toBool() );
 		spinHeight->setValue( getSettingsValue("dropbox/height").toInt() );
 	}
-	
+
 	virtual void accepted()
 	{
 		g_settings->setValue("dropbox/unhide", checkUnhide->isChecked());

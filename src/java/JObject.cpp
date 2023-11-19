@@ -84,7 +84,7 @@ void JObject::construct(const JClass& xcls, const char* sig, JArgs args)
 {
 	JNIEnv* env = *JVM::instance();
 	jclass cls = xcls;
-    
+
 	m_bWeak = false;
 
 	if (!cls)

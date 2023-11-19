@@ -41,13 +41,13 @@ QueueMgr* QueueMgr::m_instance = 0;
 QueueMgr::QueueMgr() : m_nCycle(0), m_down(0), m_up(0)
 {
 	m_instance = this;
-	
+
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(doWork()), Qt::DirectConnection);
-	
+
 	connect(TransferNotifier::instance(), SIGNAL(stateChanged(Transfer*,Transfer::State,Transfer::State)), this, SLOT(transferStateChanged(Transfer*,Transfer::State,Transfer::State)));
 	connect(TransferNotifier::instance(), SIGNAL(modeChanged(Transfer*,Transfer::Mode,Transfer::Mode)), this, SLOT(transferModeChanged(Transfer*,Transfer::Mode,Transfer::Mode)));
-	
+
 	m_timer->start(1000);
 }
 
@@ -55,53 +55,53 @@ void QueueMgr::doWork()
 {
 	int total[2] = { 0, 0 };
 	g_queuesLock.lockForRead();
-	
+
 	const bool autoremove = getSettingsValue("autoremove").toBool();
-	
+
 	foreach(Queue* q,g_queues)
 	{
 		int lim_down,lim_up;
 		int down,up, active = 0;
-		
+
 		Queue::Stats stats;
-		
+
 		memset(&stats, 0, sizeof stats);
-		
+
 		q->transferLimits(lim_down,lim_up);
 		q->speedLimits(down,up);
 		q->updateGraph();
-		
+
 		q->lock();
-		
+
 		QList<int> stopList, resumeList;
-		
+
 		for(int i=0;i<q->m_transfers.size();i++)
 		{
 			Transfer* d = q->m_transfers[i];
 			int downs,ups;
 			Transfer::State state = d->state();
 			Transfer::Mode mode = d->mode();
-			
+
 			d->updateGraph();
 			d->speeds(downs,ups);
-			
+
 			if(downs >= 1024 && mode == Transfer::Download)
 				d->m_bWorking = true;
 			else if(ups >= 1024 && mode == Transfer::Upload)
 				d->m_bWorking = true;
-			
+
 			stats.down += downs;
 			stats.up += ups;
-			
+
 			if(state == Transfer::Waiting || state == Transfer::Active)
 			{
 				int* lim;
-				
+
 				if(mode == Transfer::Download || q->m_bUpAsDown)
 					lim = &lim_down;
 				else
 					lim = &lim_up;
-				
+
 				if(*lim != 0)
 				{
 					(*lim)--;
@@ -115,7 +115,7 @@ void QueueMgr::doWork()
 				doMove(q, d);
 				q->remove(i--, true);
 			}
-			
+
 			if(d->isActive())
 			{
 				( (mode == Transfer::Download) ? stats.active_d : stats.active_u) ++;
@@ -124,24 +124,24 @@ void QueueMgr::doWork()
 			else if(d->state() == Transfer::Waiting)
 				( (mode == Transfer::Download) ? stats.waiting_d : stats.waiting_u) ++;
 		}
-		
+
 		foreach(int x, stopList)
 			q->m_transfers[x]->setState(Transfer::Waiting);
 		foreach(int x, resumeList)
 			q->m_transfers[x]->setState(Transfer::Active);
-		
+
 		total[0] += stats.down;
 		total[1] += stats.up;
-		
+
 		int size = q->size();
-		
+
 		if(size && active)
 		{
 			float avgd, avgu, supd, supu;
 			int curd, curu;
-			
+
 			q->autoLimits(curd, curu);
-			
+
 			if(!curd)
 				curd = down/active;
 			else if(down)
@@ -152,7 +152,7 @@ void QueueMgr::doWork()
 			}
 			else
 				curd = 0;
-			
+
 			if(!curu)
 				curu = up/active;
 			else if(up)
@@ -164,7 +164,7 @@ void QueueMgr::doWork()
 			}
 			else
 				curu = 0;
-			
+
 			if(curd)
 			{
 				if(curd < 1024)
@@ -186,21 +186,21 @@ void QueueMgr::doWork()
 			}
 			if(curu > up)
 				curu = up;
-			
+
 			//qDebug() << "Setting" << curu;
 			q->setAutoLimits(curd, curu);
 		}
-		
+
 		q->m_stats = stats;
-		
+
 		q->unlock();
 	}
-	
+
 	g_queuesLock.unlock();
-	
+
 	m_down = total[0];
 	m_up = total[1];
-	
+
 	if(++m_nCycle > 60)
 	{
 		m_nCycle = 0;
@@ -214,7 +214,7 @@ void QueueMgr::doMove(Queue* q, Transfer* t)
 	QString whereTo = q->moveDirectory();
 	if(whereTo.isEmpty() || t->primaryMode() != Transfer::Download)
 		return;
-	
+
 	try
 	{
 		t->setObject(whereTo);
@@ -243,7 +243,7 @@ void QueueMgr::transferStateChanged(Transfer* t, Transfer::State, Transfer::Stat
 			bRetry = t->m_bWorking;
 		else if(g_settings->value("retrycount", getSettingsDefault("retrycount")).toInt() > t->m_nRetryCount)
 			bRetry = true;
-		
+
 		if(bRetry)
 			QMetaObject::invokeMethod(t, "retry", Qt::QueuedConnection);
 	}
@@ -275,7 +275,7 @@ Queue* QueueMgr::findQueue(Transfer* t)
 void QueueMgr::exit()
 {
 	delete m_timer;
-	
+
 	QReadLocker l(&g_queuesLock);
 	foreach(Queue* q,g_queues)
 	{

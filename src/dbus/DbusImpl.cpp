@@ -58,33 +58,33 @@ void DbusImpl::addTransfers(QString uris)
 QString DbusImpl::addTransfersNonInteractive(QString uris, QString target, QString className, int queueID)
 {
 	QReadLocker locker(&g_queuesLock);
-	
+
 	try
 	{
 		QStringList listUris;
-		
+
 		if(uris.isEmpty())
 			throw RuntimeException("No URIs were passed");
-		
+
 		if(!getSettingsValue("link_separator").toInt())
 			listUris = uris.split('\n', Qt::SkipEmptyParts);
 		else
 			listUris = uris.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
 		for(int i = 0; i < listUris.size(); i++)
 			listUris[i] = listUris[i].trimmed();
-		
+
 		if(queueID < 0 || queueID >= g_queues.size())
 			throw RuntimeException("queueID is out of range");
-	
+
 		const EngineEntry* _class = 0;
 		if(className == "auto")
 		{
 			Transfer::BestEngine eng;
-			
+
 			eng = Transfer::bestEngine(listUris[0], Transfer::Download);
 			if(eng.nClass < 0)
 				eng = Transfer::bestEngine(target, Transfer::Upload);
-			
+
 			if(eng.nClass < 0)
 				throw RuntimeException("The URI wasn't accepted by any class");
 			else
@@ -100,7 +100,7 @@ QString DbusImpl::addTransfersNonInteractive(QString uris, QString target, QStri
 					break;
 				}
 			}
-			
+
 			for(int i=0;i<g_enginesUpload.size();i++)
 			{
 				if(className == g_enginesUpload[i].shortName)
@@ -109,18 +109,18 @@ QString DbusImpl::addTransfersNonInteractive(QString uris, QString target, QStri
 					break;
 				}
 			}
-			
+
 			if(!_class)
 				throw RuntimeException("className doesn't represent any known class");
 		}
-		
+
 		foreach(QString uri, listUris)
 		{
 			Transfer* t = TransferFactory::instance()->createInstance(_class->shortName);
-			
+
 			if(!t)
 				throw RuntimeException("Failed to create an instance of the chosen class");
-			
+
 			try
 			{
 				t->init(uri, target);
@@ -131,7 +131,7 @@ QString DbusImpl::addTransfersNonInteractive(QString uris, QString target, QStri
 				delete t;
 				throw;
 			}
-			
+
 			Queue* q = g_queues[queueID];
 			q->lockW();
 			q->add(t);
@@ -150,10 +150,10 @@ QStringList DbusImpl::getQueues()
 {
 	QStringList result;
 	g_queuesLock.lockForRead();
-	
+
 	foreach(Queue* q, g_queues)
 		result << q->name();
-	
+
 	g_queuesLock.unlock();
 	return result;
 }
@@ -161,7 +161,7 @@ QStringList DbusImpl::getQueues()
 void DbusImpl::addTransfersNonInteractive2(QString uris, QString target, QString className, int queueID, QString* resp)
 {
 	QString r = addTransfersNonInteractive(uris, target, className, queueID);
-	
+
 	if(r.isEmpty())
 		r = "OK";
 	*resp = r;
@@ -181,7 +181,7 @@ QString DbusImpl::addTransfers(QString uris, QString target, QString className, 
 			"addTransfersNonInteractive2", Qt::QueuedConnection,
 			Q_ARG(QString, uris), Q_ARG(QString, target),
 			Q_ARG(QString, className), Q_ARG(int, queueID), Q_ARG(QString*, &response));
-	
+
 	while(response.isEmpty())
 		Sleeper::msleep(100);
 	Sleeper::msleep(100);

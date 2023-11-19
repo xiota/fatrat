@@ -49,7 +49,7 @@ TransfersModel::TransfersModel(QObject* parent)
 	m_states[3] = new QIcon(":/states/paused.png");
 	m_states[4] = new QIcon(":/states/failed.png");
 	m_states[5] = new QIcon(":/states/completed.png");
-	
+
 	m_states[6] = new QIcon(":/states/waiting_upload.png");
 	m_states[7] = new QIcon(":/states/distribute.png");
 	m_states[8] = new QIcon(":/states/forced_distribute.png");
@@ -111,46 +111,46 @@ int TransfersModel::rowCount(const QModelIndex &parent) const
 	if(!parent.isValid())
 	{
 		g_queuesLock.lockForRead();
-		
+
 		if(m_queue < g_queues.size() && m_queue >= 0)
 			count = g_queues[m_queue]->size();
-		
+
 		g_queuesLock.unlock();
 	}
-	
+
 	return count;
 }
 
 TransfersModel::RowData TransfersModel::createDataSet(Transfer* t)
 {
 	RowData newData;
-	
+
 	const qint64 total = t->total();
-	
+
 	newData.state = t->state();
 	newData.name = t->name();
 	newData.fProgress = (total) ? 100.0/t->total()*t->done() : 0;
 	newData.progress = (total) ? QString("%1%").arg(newData.fProgress, 0, 'f', 1) : QString();
 	newData.size = (total) ? formatSize(t->total()) : QString("?");
-	
+
 	if(t->isActive())
 	{
 		int down,up;
 		t->speeds(down,up);
-		
+
 		if(down || t->mode() == Transfer::Download)
 			newData.speedDown = formatSize(down, true);
 		if(up || t->mode() == Transfer::Upload)
 			newData.speedUp = formatSize(up, true);
-		
+
 		if(t->total())
 		{
 			QString s;
 			int down,up;
 			qulonglong totransfer = t->total() - t->done();
-			
+
 			t->speeds(down,up);
-			
+
 			if(t->primaryMode() == Transfer::Download)
 			{
 				if(down)
@@ -160,11 +160,11 @@ TransfersModel::RowData TransfersModel::createDataSet(Transfer* t)
 				newData.timeLeft = formatTime(totransfer/up);
 		}
 	}
-	
+
 	newData.message = t->message();
 	newData.mode = t->mode();
 	newData.primaryMode = t->primaryMode();
-	
+
 	return newData;
 }
 
@@ -173,15 +173,15 @@ void TransfersModel::refresh()
 	int count = 0;
 	Queue* q = 0;
 	g_queuesLock.lockForRead();
-	
+
 	if(m_queue < g_queues.size() && m_queue >= 0)
 	{
 		q = g_queues[m_queue];
 		count = q->size();
 	}
-	
+
 	m_lastData.resize(count);
-	
+
 	QList<bool> changes;
 	MainWindow* w = static_cast<MainWindow*>(getMainWindow());
 	QString filter;
@@ -189,11 +189,11 @@ void TransfersModel::refresh()
 	if(w)
 		filter = w->getFilterText();
 	m_filterMapping.clear();
-	
+
 	if(q != 0)
 	{
 		q->lock();
-		
+
 		int filtered = 0;
 		for(int i=0,j=0;i<count;i++,j++)
 		{
@@ -208,10 +208,10 @@ void TransfersModel::refresh()
 				j--;
 				continue;
 			}
-			
+
 			if(t != 0)
 				newData = createDataSet(t);
-			
+
 			changes << (newData != m_lastData[j]);
 			m_lastData[j] = newData;
 		}
@@ -219,7 +219,7 @@ void TransfersModel::refresh()
 		q->unlock();
 	}
 	g_queuesLock.unlock();
-	
+
 	if(count > m_nLastRowCount)
 	{
 		qDebug() << "Adding" << count - m_nLastRowCount << "rows";
@@ -233,7 +233,7 @@ void TransfersModel::refresh()
 		endRemoveRows();
 	}
 	m_nLastRowCount = count;
-	
+
 	for(int i=0;i<count;)
 	{
 		if(!changes[i])
@@ -243,7 +243,7 @@ void TransfersModel::refresh()
 			int from = i, to;
 			while(i < count && changes[i])
 				to = i++;
-			
+
 			dataChanged(createIndex(from,0), createIndex(to,5)); // refresh the view
 		}
 	}
@@ -267,7 +267,7 @@ int TransfersModel::columnCount(const QModelIndex&) const
 QVariant TransfersModel::data(const QModelIndex &index, int role) const
 {
 	int row = index.row();
-	
+
 	if(role == Qt::DisplayRole)
 	{
 		if(row < m_lastData.size())
@@ -343,9 +343,9 @@ QMimeData* TransfersModel::mimeData(const QModelIndexList&) const
 	QByteArray encodedData;
 	QByteArray files;
 	QList<int> sel = g_wndMain->getSelection();
-	
+
 	Queue* q = g_queues[m_queue];
-	
+
 	q->lock();
 	foreach(int x, sel)
 	{
@@ -358,10 +358,10 @@ QMimeData* TransfersModel::mimeData(const QModelIndexList&) const
 
 	QDataStream stream(&encodedData, QIODevice::WriteOnly);
 	stream << m_queue << sel;
-	
+
 	mimeData->setData("application/x-fatrat-transfer", encodedData);
 	mimeData->setData("text/uri-list", files);
-	
+
 	return mimeData;
 }
 
@@ -380,23 +380,23 @@ void ProgressDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		TransfersModel* model = (TransfersModel*) index.internalPointer();
 		QStyleOptionProgressBarV2 opts;
 		const int row = index.row();
-		
+
 		if(row < model->m_lastData.size())
 		{
 			if(model->m_lastData[row].size != "?")
 				opts.text = QString("%1%").arg(model->m_lastData[row].fProgress, 0, 'f', 1);
 			else
 				opts.text = "?";
-			
+
 			opts.maximum = 1000;
 			opts.minimum = 0;
 			opts.progress = int( model->m_lastData[row].fProgress*10 );
 			opts.rect = option.rect;
 			opts.textVisible = true;
 			opts.state = QStyle::State_Enabled;
-			
+
 			QApplication::style()->drawControl(QStyle::CE_ProgressBar, &opts, painter);
-			
+
 		}
 	}
 	else

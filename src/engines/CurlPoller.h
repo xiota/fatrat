@@ -43,17 +43,17 @@ class CurlPoller : public QThread
 public:
 	CurlPoller();
 	~CurlPoller();
-	
+
 	void addTransfer(CurlUser* obj);
 	// will handle the underlying CURL* too
 	void removeTransfer(CurlUser* obj, bool nodeep = false);
 	//void removeSafely(CURL* curl);
 	void addTransfer(CurlPollingMaster* obj);
 	void removeTransfer(CurlPollingMaster* obj);
-	
+
 	void run();
 	void checkErrors(timeval tvNow);
-	
+
 	static CurlPoller* instance() { return m_instance; }
 protected:
 	void epollEnable(int socket, int events);
@@ -71,15 +71,15 @@ protected:
 	Poller* m_poller;
 	int m_curlTimeout;
 	long m_timeout;
-	
+
 	typedef QMap<int, QPair<int,CurlStat*> > sockets_hash;
-	
+
 	QMap<CURL*, CurlUser*> m_users;
 	QMap<int, CurlPollingMaster*> m_masters;
 	sockets_hash m_sockets;
 	QMutex m_usersLock;
 	QQueue<CurlUser*> m_queueToDelete;
-	
+
 	QList<int> m_socketsToRemove;
 	sockets_hash m_socketsToAdd;
 

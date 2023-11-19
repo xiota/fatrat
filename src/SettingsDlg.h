@@ -52,7 +52,7 @@ public:
 			}
 		}
 	}
-	
+
 	virtual void accept();
 	int exec();
 public slots:

@@ -39,22 +39,22 @@ RssRegexpDlg::RssRegexpDlg(QWidget* parent)
 : QDialog(parent)
 {
 	setupUi(this);
-	
+
 	m_regexp.tvs = RssRegexp::None;
-	
+
 	connect(lineText, SIGNAL(textChanged(const QString&)), this, SLOT(test()));
 	connect(lineExpression, SIGNAL(textChanged(const QString&)), this, SLOT(test()));
 	connect(toolBrowse, SIGNAL(clicked()), this, SLOT(browse()));
-	
+
 	connect(radioTVSNone, SIGNAL(toggled(bool)), this, SLOT(updateTVS()));
 	connect(radioTVSSeason, SIGNAL(toggled(bool)), this, SLOT(updateTVS()));
 	connect(radioTVSEpisode, SIGNAL(toggled(bool)), this, SLOT(updateTVS()));
 	connect(radioTVSDate, SIGNAL(toggled(bool)), this, SLOT(updateTVS()));
 	connect(radioParsingNone, SIGNAL(toggled(bool)), this, SLOT(updateParsing()));
 	connect(radioParsingExtract, SIGNAL(toggled(bool)), this, SLOT(updateParsing()));
-	
+
 	connect(labelManage, SIGNAL(linkActivated(const QString&)), this, SLOT(linkClicked(const QString&)));
-	
+
 	m_regexp.includeRepacks = true;
 	m_regexp.excludeManuals = true;
 	m_regexp.includeTrailers = false;
@@ -70,7 +70,7 @@ void RssRegexpDlg::updateTVS()
 {
 	const char* mask = "";
 	const char *from = "", *to = "";
-	
+
 	if(radioTVSNone->isChecked())
 	{
 		lineTVSFrom->setEnabled(false);
@@ -80,7 +80,7 @@ void RssRegexpDlg::updateTVS()
 	{
 		lineTVSFrom->setEnabled(true);
 		lineTVSTo->setEnabled(true);
-		
+
 		if(radioTVSSeason->isChecked())
 		{
 			mask = to = "S99E99";
@@ -97,7 +97,7 @@ void RssRegexpDlg::updateTVS()
 			from = "0000-00-00";
 		}
 	}
-	
+
 	lineTVSFrom->setInputMask(mask);
 	lineTVSTo->setInputMask(mask);
 	lineTVSFrom->setText(from);
@@ -108,7 +108,7 @@ void RssRegexpDlg::linkClicked(const QString& link)
 {
 	if(link != "manageDownloaded" || radioTVSNone->isChecked())
 		return;
-	
+
 	const char* mask = "";
 	if(radioTVSSeason->isChecked())
 		mask = "S99E99";
@@ -116,7 +116,7 @@ void RssRegexpDlg::linkClicked(const QString& link)
 		mask = "9999";
 	else if(radioTVSDate->isChecked())
 		mask = "9999-99-99";
-	
+
 	RssDownloadedDlg dlg(&m_regexp.epDone, mask, this);
 	dlg.exec();
 }
@@ -124,32 +124,32 @@ void RssRegexpDlg::linkClicked(const QString& link)
 int RssRegexpDlg::exec()
 {
 	int r;
-	
+
 	if(m_feeds.isEmpty() || g_queues.isEmpty())
 		return QDialog::Rejected;
-	
+
 	for(int i=0;i<m_feeds.size();i++)
 	{
 		comboFeed->addItem(m_feeds[i].name);
 		comboFeed->setItemData(i, m_feeds[i].url);
-		
+
 		if(m_feeds[i].url == m_regexp.source)
 			comboFeed->setCurrentIndex(i);
 	}
-	
-	
+
+
 	g_queuesLock.lockForRead();
 	for(int i=0;i<g_queues.size();i++)
 	{
 		comboQueue->addItem(g_queues[i]->name());
 		comboQueue->setItemData(i, g_queues[i]->uuid());
 		comboQueue->setItemData(i, g_queues[i]->defaultDirectory(), Qt::UserRole+1);
-		
+
 		if(g_queues[i]->uuid() == m_regexp.queueUUID)
 			comboQueue->setCurrentIndex(i);
 	}
 	g_queuesLock.unlock();
-	
+
 	if(m_regexp.target.isEmpty())
 	{
 		m_nLastQueue = comboQueue->currentIndex();
@@ -158,10 +158,10 @@ int RssRegexpDlg::exec()
 		else
 			m_regexp.target = QDir::homePath();
 	}
-	
+
 	lineExpression->setText(m_regexp.regexp.pattern());
 	lineTarget->setText(m_regexp.target);
-	
+
 	switch(m_regexp.tvs)
 	{
 	case RssRegexp::None:
@@ -173,7 +173,7 @@ int RssRegexpDlg::exec()
 	case RssRegexp::DateBased:
 		radioTVSDate->setChecked(true); break;
 	}
-	
+
 	lineTVSFrom->setText(m_regexp.from);
 	lineTVSTo->setText(m_regexp.to);
 	checkTVSRepacks->setChecked(m_regexp.includeRepacks);
@@ -186,23 +186,23 @@ int RssRegexpDlg::exec()
 		radioParsingExtract->setChecked(true);
 		lineParsingRegexp->setText(m_regexp.linkRegexp.pattern());
 	}
-	
+
 	connect(comboQueue, SIGNAL(currentIndexChanged(int)), this, SLOT(queueChanged(int)));
-	
+
 	test();
 	updateParsing();
-	
+
 	if((r = QDialog::exec()) == QDialog::Accepted)
 	{
 		m_regexp.regexp = QRegularExpression(lineExpression->text(), Qt::CaseInsensitive);
 		m_regexp.target = lineTarget->text();
-		
+
 		m_regexp.queueUUID = comboQueue->itemData(comboQueue->currentIndex()).toString();
 		m_regexp.source = comboFeed->itemData(comboFeed->currentIndex()).toString();
-		
+
 		m_regexp.from = lineTVSFrom->text();
 		m_regexp.to = lineTVSTo->text();
-		
+
 		if(radioTVSNone->isChecked())
 			m_regexp.tvs = RssRegexp::None;
 		else if(radioTVSSeason->isChecked())
@@ -211,7 +211,7 @@ int RssRegexpDlg::exec()
 			m_regexp.tvs = RssRegexp::EpisodeBased;
 		else
 			m_regexp.tvs = RssRegexp::DateBased;
-		
+
 		m_strFeedName = comboFeed->currentText();
 		m_regexp.includeRepacks = checkTVSRepacks->isChecked();
 		m_regexp.includeTrailers = checkTVSTrailers->isChecked();
@@ -219,7 +219,7 @@ int RssRegexpDlg::exec()
 		m_regexp.addPaused = checkAddPaused->isChecked();
 		m_regexp.linkRegexp = QRegularExpression(lineParsingRegexp->text(), Qt::CaseInsensitive);
 	}
-	
+
 	return r;
 }
 
@@ -227,10 +227,10 @@ void RssRegexpDlg::queueChanged(int now)
 {
 	if(m_nLastQueue == now)
 		return;
-	
+
 	if(lineTarget->text() == comboQueue->itemData(m_nLastQueue, Qt::UserRole+1).toString())
 		lineTarget->setText(comboQueue->itemData(now, Qt::UserRole+1).toString());
-	
+
 	m_nLastQueue = now;
 }
 

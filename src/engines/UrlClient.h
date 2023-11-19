@@ -36,7 +36,7 @@ Q_OBJECT
 public:
 	UrlClient();
 	~UrlClient();
-	
+
 	enum FtpMode { FtpActive = 0, FtpPassive };
 	struct UrlObject
 	{
@@ -47,10 +47,10 @@ public:
 		QUuid proxy;
 		QList<QNetworkCookie> cookies;
 	};
-	
+
 	void start();
 	void stop();
-	
+
 	void setSourceObject(UrlObject& obj);
 	void setTargetObject(int fd);
 	// The range is in form <from, to)
@@ -59,7 +59,7 @@ public:
 	qlonglong rangeFrom() const { return m_rangeFrom; }
 	qlonglong rangeTo() const { return m_rangeTo; }
 	void setPollingMaster(CurlPollingMaster* master);
-	
+
 	virtual CURL* curlHandle();
 	virtual bool writeData(const char* buffer, size_t bytes);
 	virtual void transferDone(CURLcode result);

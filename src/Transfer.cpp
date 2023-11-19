@@ -125,12 +125,12 @@ void Transfer::setInternalSpeedLimits(int down,int up)
 		down = m_nDownLimit;
 	if((m_nUpLimit < up && m_nUpLimit) || !up)
 		up = m_nUpLimit;
-	
+
 	if(down != m_nDownLimitInt || up != m_nUpLimitInt)
 	{
 		m_nDownLimitInt = down;
 		m_nUpLimitInt = up;
-	
+
 		setSpeedLimits(down,up);
 	}
 }
@@ -153,7 +153,7 @@ Transfer* Transfer::createInstance(QString className)
 		if(className == g_enginesUpload[i].shortName)
 			return g_enginesUpload[i].lpfnCreate2(&g_enginesUpload[i]);
 	}
-	
+
 	return 0;
 }
 
@@ -175,7 +175,7 @@ int Transfer::getEngineID(QString className, Mode type)
 				return i;
 		}
 	}
-	
+
 	return -1;
 }
 
@@ -188,7 +188,7 @@ const char* Transfer::getEngineName(int id, Mode type)
 Transfer* Transfer::createInstance(Mode mode, int classID)
 {
 	const EngineEntry* entries = engines(mode);
-	
+
 	return entries[classID].lpfnCreate2(&entries[classID]);
 }
 
@@ -228,22 +228,22 @@ Transfer::BestEngine Transfer::bestEngine(QString uri, Mode type)
 {
 	int curscore = 0;
 	BestEngine best;
-	
+
 	if(type != Upload)
 	{
 		for(int i=0;i<g_enginesDownload.size();i++)
 		{
 			int n;
-			
+
 			if(!g_enginesDownload[i].lpfnAcceptable)
 				continue;
-			
+
 			n = g_enginesDownload[i].lpfnAcceptable2(uri, type == ModeInvalid, &g_enginesDownload[i]);
-			
+
 			if(n > curscore)
 			{
 				curscore = n;
-				
+
 				best.engine = &g_enginesDownload[i];
 				best.nClass = i;
 				best.type = Download;
@@ -255,23 +255,23 @@ Transfer::BestEngine Transfer::bestEngine(QString uri, Mode type)
 		for(int i=0;i<g_enginesUpload.size();i++)
 		{
 			int n;
-			
+
 			if(!g_enginesUpload[i].lpfnAcceptable)
 				continue;
-			
+
 			n = g_enginesUpload[i].lpfnAcceptable2(uri, type == ModeInvalid, &g_enginesUpload[i]);
-			
+
 			if(n > curscore)
 			{
 				curscore = n;
-				
+
 				best.engine = &g_enginesUpload[i];
 				best.nClass = i;
 				best.type = Upload;
 			}
 		}
 	}
-	
+
 	return best;
 }
 
@@ -279,29 +279,29 @@ void Transfer::setState(State newState)
 {
 	bool now,was = isActive();
 	m_lastState = m_state;
-	
+
 	if(newState == m_lastState)
 		return;
-	
+
 	enterLogMessage(tr("Changed state: %1 -> %2").arg(state2string(m_state)).arg(state2string(newState)));
-	
+
 	if(newState == Completed)
 		fireCompleted();
-	
+
 	m_state = newState;
 	now = isActive();
-	
+
 	if(now != was)
 	{
 		m_bWorking = false;
 		changeActive(now);
-		
+
 		if(now)
 			m_timeStart = QDateTime::currentDateTime();
 		else
 			m_nTimeRunning += m_timeStart.secsTo(QDateTime::currentDateTime());
 	}
-	
+
 	if(!m_bLocal)
 		emit TransferNotifier::instance()->stateChanged(this, m_lastState, newState);
 	emit stateChanged(m_state, newState);
@@ -347,17 +347,17 @@ QString Transfer::state2string(State s)
 void Transfer::load(const QDomNode& map)
 {
 	int down = 0, up = 0;
-	
+
 	setState(string2state(getXMLProperty(map, "state")));
 	down = getXMLProperty(map, "downlimit").toInt();
 	up = getXMLProperty(map, "uplimit").toInt();
 	m_strComment = getXMLProperty(map, "comment");
 	m_nTimeRunning = getXMLProperty(map, "timerunning").toLongLong();
 	m_uuid = QUuid::fromString(getXMLProperty(map, "uuid"));
-	
+
 	if(m_uuid.isNull())
 		m_uuid = QUuid::createUuid();
-	
+
 	QDomElement n = map.firstChildElement("action");
 	while(!n.isNull())
 	{
@@ -365,7 +365,7 @@ void Transfer::load(const QDomNode& map)
 			m_strCommandCompleted = n.firstChild().toText().data();
 		n = n.nextSiblingElement("action");
 	}
-	
+
 	setUserSpeedLimits(down, up);
 }
 
@@ -377,12 +377,12 @@ void Transfer::save(QDomDocument& doc, QDomNode& node) const
 	setXMLProperty(doc, node, "comment", m_strComment);
 	setXMLProperty(doc, node, "timerunning", QString::number(timeRunning()));
 	setXMLProperty(doc, node, "uuid", m_uuid.toString());
-	
+
 	QDomElement elem = doc.createElement("action");
 	QDomText text = doc.createTextNode(m_strCommandCompleted);
 	elem.setAttribute("state", "Completed");
 	elem.appendChild(text);
-	
+
 	node.appendChild(elem);
 }
 
@@ -397,9 +397,9 @@ void Transfer::setMode(Mode newMode)
 void Transfer::updateGraph()
 {
 	int down, up;
-	
+
 	speeds(down,up);
-	
+
 	if(m_qSpeedData.size() >= getSettingsValue("graphminutes").toInt()*60)
 		m_qSpeedData.dequeue();
 	m_qSpeedData.enqueue(QPair<int,int>(down,up));
@@ -425,7 +425,7 @@ void Transfer::setXMLProperty(QDomDocument& doc, QDomNode& node, QString name, Q
 QString Transfer::dataPath(bool bDirect) const
 {
 	QString obj = object();
-	
+
 	if(primaryMode() == Download)
 	{
 		if(bDirect)
@@ -464,7 +464,7 @@ void Transfer::fireCompleted()
 {
 	if(m_strCommandCompleted.isEmpty())
 		return;
-	
+
 	QString exec = m_strCommandCompleted;
 	for(int i=0;i<exec.size() - 1;)
 	{
@@ -472,7 +472,7 @@ void Transfer::fireCompleted()
 			continue;
 		QChar t = exec[i];
 		QString text;
-		
+
 		if(t == QChar('N')) // transfer name
 			text = name();
 		else if(t == QChar('T')) // transfer type
@@ -483,13 +483,13 @@ void Transfer::fireCompleted()
 			text = dataPath(true);
 		else
 			continue;
-		
+
 		exec.replace(i-1, 2, text);
 		i += text.size() - 1;
 	}
-	
+
 	qDebug() << "Executing" << exec;
-	
+
 	QProcess::startDetached("/bin/sh", QStringList() << "-c" << exec);
 }
 

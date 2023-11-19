@@ -89,19 +89,19 @@ void Queue::loadQueues()
 	QDomDocument doc;
 	QFile file;
 	QDir dir = QDir::home();
-	
+
 	dir.mkpath(".local/share/fatrat");
 	if(!dir.cd(".local/share/fatrat"))
 		return;
 	file.setFileName(dir.absoluteFilePath("queues.xml"));
-	
+
 	QString errmsg;
 	if(!file.open(QIODevice::ReadOnly) || !doc.setContent(&file, false, &errmsg))
 	{
 		qDebug() << "Failed to open " << file.fileName();
 		if(!errmsg.isEmpty())
 			qDebug() << "PARSE ERROR!" << errmsg;
-		
+
 		// default queue for new users
 		Queue* q = new Queue;
 		q->setName(QObject::tr("Main queue"));
@@ -111,9 +111,9 @@ void Queue::loadQueues()
 	{
 		g_queuesLock.lockForWrite();
 		qDeleteAll(g_queues);
-		
+
 		qDebug() << "Loading queues";
-		
+
 		QDomElement n = doc.documentElement().firstChildElement("queue");
 		while(!n.isNull())
 		{
@@ -122,7 +122,7 @@ void Queue::loadQueues()
 			else
 			{
 				Queue* pQueue = new Queue;
-				
+
 				pQueue->m_strName = n.attribute("name");
 				pQueue->m_nDownLimit = n.attribute("downlimit").toInt();
 				pQueue->m_nUpLimit = n.attribute("uplimit").toInt();
@@ -132,13 +132,13 @@ void Queue::loadQueues()
 				pQueue->m_uuid = QUuid( n.attribute("uuid", pQueue->m_uuid.toString()) );
 				pQueue->m_strDefaultDirectory = n.attribute("defaultdir", pQueue->m_strDefaultDirectory);
 				pQueue->m_strMoveDirectory = n.attribute("movedir");
-				
+
 				pQueue->loadQueue(n);
 				g_queues << pQueue;
 			}
 			n = n.nextSiblingElement("queue");
 		}
-		
+
 		g_queuesLock.unlock();
 	}
 
@@ -171,19 +171,19 @@ void Queue::saveQueues()
 	QDomElement root;
 	QFile file;
 	QDir dir = QDir::home();
-	
+
 	if(!dir.cd(".local/share/fatrat"))
 		return;
 	file.setFileName(dir.filePath("queues.xml.new"));
-	
+
 	if(!file.open(QIODevice::WriteOnly))
 		return;
-	
+
 	root = doc.createElement("fatrat");
 	doc.appendChild(root);
-	
+
 	g_queuesLock.lockForRead();
-	
+
 	foreach(Queue* q, g_queues)
 	{
 		QDomElement elem = doc.createElement("queue");
@@ -196,11 +196,11 @@ void Queue::saveQueues()
 		elem.setAttribute("uuid",q->m_uuid.toString());
 		elem.setAttribute("defaultdir",q->m_strDefaultDirectory);
 		elem.setAttribute("movedir",q->m_strMoveDirectory);
-		
+
 		q->saveQueue(elem,doc);
 		root.appendChild(elem);
 	}
-	
+
 	g_queuesLock.unlock();
 	if (file.write(doc.toByteArray()) == -1 || !file.flush())
 		Logger::global()->enterLogMessage(tr("Queue"), tr("Failed to write the queue file!"));
@@ -209,7 +209,7 @@ void Queue::saveQueues()
 
 		QByteArray path = (dir.path() + "/queues.xml.new").toUtf8();
 		QByteArray dpath = (dir.path() + "/queues.xml").toUtf8();
-		
+
 		qDebug() << "Saving queue to" << dpath;
 		rename(path.data(), dpath.data());
 	}
@@ -218,25 +218,25 @@ void Queue::saveQueues()
 void Queue::loadQueue(const QDomNode& node)
 {
 	m_lock.lockForWrite();
-	
+
 	qDeleteAll(m_transfers);
-	
+
 	QDomElement n = node.firstChildElement("download");
 	while(!n.isNull())
 	{
 		QDomElement e = n.firstChildElement("param");
 		QMap<QString,QString> map;
 		Transfer* d;
-		
+
 		d = Transfer::createInstance(n.attribute("class"));
-		
+
 		if(d != 0)
 		{
 			/*while(!e.isNull())
 			{
 				if(e.hasAttribute("name"))
 					map[e.attribute("name")] = e.text();
-				
+
 				e = e.nextSiblingElement("param");
 			}
 			*/
@@ -251,27 +251,27 @@ void Queue::loadQueue(const QDomNode& node)
 			d->load(n);
 			m_transfers << d;
 		}
-		
+
 		n = n.nextSiblingElement("download");
 	}
-	
+
 	m_lock.unlock();
 }
 
 void Queue::saveQueue(QDomNode& node,QDomDocument& doc)
 {
 	lock();
-	
+
 	foreach(Transfer* d,m_transfers)
 	{
 		QDomElement elem = doc.createElement("download");
-		
+
 		d->save(doc, elem);
 		elem.setAttribute("class",d->myClass());
-		
+
 		node.appendChild(elem);
 	}
-	
+
 	unlock();
 }
 
@@ -312,7 +312,7 @@ int Queue::moveDown(int n, bool nolock)
 		m_transfers.swap(n,n+1);
 		if (!nolock)
 			m_lock.unlock();
-		
+
 		return n+1;
 	}
 	else
@@ -337,10 +337,10 @@ int Queue::moveUp(int n, bool nolock)
 void Queue::moveToPos(int from, int to, bool nolock)
 {
 	Transfer* t;
-	
+
 	if(to > from)
 		to--;
-	
+
 	if (!nolock)
 		m_lock.lockForWrite();
 	t = m_transfers.takeAt(from);
@@ -370,21 +370,21 @@ void Queue::moveToBottom(int n, bool nolock)
 Transfer* Queue::take(int n, bool nolock)
 {
 	Transfer* d = 0;
-	
+
 	if(!nolock)
 		m_lock.lockForWrite();
 	if(n < size() && n >= 0)
 		d = m_transfers.takeAt(n);
 	if(!nolock)
 		m_lock.unlock();
-	
+
 	return d;
 }
 
 void Queue::remove(int n, bool nolock)
 {
 	Transfer* d = take(n, nolock);
-	
+
 	if(d->isActive())
 		d->setState(Transfer::Paused);
 	d->deleteLater();
@@ -393,15 +393,15 @@ void Queue::remove(int n, bool nolock)
 void Queue::removeWithData(int n, bool nolock)
 {
 	Transfer* d = take(n, nolock);
-	
+
 	if(d->isActive())
 		d->setState(Transfer::Paused);
-	
+
 	QString path = d->dataPath(true);
-	
+
 	if(!path.isEmpty() && d->primaryMode() == Transfer::Download)
 		recursiveRemove(path);
-	
+
 	d->deleteLater();
 }
 
@@ -409,7 +409,7 @@ void Queue::setAutoLimits(int down, int up)
 {
 	m_nDownAuto = down;
 	m_nUpAuto = up;
-	
+
 	foreach(Transfer* d, m_transfers)
 	{
 		if(!d->isActive())

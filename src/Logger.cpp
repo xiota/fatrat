@@ -57,7 +57,7 @@ void Logger::toggleSysLog(bool on)
 void Logger::enterLogMessage(QString msg)
 {
 	QWriteLocker l(&m_lock);
-	
+
 	QString text = QString("%1 %2 - %3")
 		.arg( QDate::currentDate().toString(Qt::ISODate) )
 		.arg( QTime::currentTime().toString(Qt::ISODate) )
@@ -65,9 +65,9 @@ void Logger::enterLogMessage(QString msg)
 
 	if(!m_strLog.isEmpty())
 		m_strLog += '\n';
-	
+
 	m_strLog += text;
-	
+
 	if (m_strLog.size() > 2*1024*1024)
 		m_strLog = m_strLog.mid(1024*1024);
 

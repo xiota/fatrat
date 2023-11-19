@@ -46,7 +46,7 @@ protected slots:
 	void feedAdd();
 	void feedEdit();
 	void feedDelete();
-	
+
 	void regexpAdd();
 	void regexpEdit();
 	void regexpDelete();

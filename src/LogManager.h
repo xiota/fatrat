@@ -44,7 +44,7 @@ public:
 	{
 		if(t == m_last)
 			return;
-		
+
 		if(m_last != 0)
 		{
 			disconnect(m_last, SIGNAL(logMessage(QString)), m_text, SLOT(append(const QString&)));
@@ -52,7 +52,7 @@ public:
 			disconnect(m_last, SIGNAL(destroyed()), this, SLOT(onDeleteSource()));
 		}
 		m_last = t;
-		
+
 		if(t != 0)
 		{
 			m_text->setEnabled(true);

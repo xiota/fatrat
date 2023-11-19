@@ -44,20 +44,20 @@ public:
 	JUploadPlugin(const char* clsName, const char* sig = "()V", JArgs args = JArgs());
 
 	static void registerNatives();
-	
+
 	// JNI methods
 	static void startUploadChunk(JNIEnv *, jobject, jstring, jobjectArray, jlong, jlong);
 	static void putDownloadLink(JNIEnv *, jobject, jstring, jstring);
 
 	virtual void setPersistentVariable(QString key, QVariant value);
 	virtual QVariant getPersistentVariable(QString key);
-	
+
 	class JMimePart : public JObject
 	{
 	public:
 		JMimePart(JObject obj);
 		enum MimePartType { MimePartValue, MimePartFile };
-		
+
 		MimePartType mimePartType();
 		QString name();
 		QString value();

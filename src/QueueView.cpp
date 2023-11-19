@@ -49,36 +49,36 @@ bool QueueView::dropMimeData(QTreeWidgetItem* parent, int index, const QMimeData
 {
 	if(action == Qt::IgnoreAction)
 		return true;
-	
+
 	int queueTo = parent->treeWidget()->indexOfTopLevelItem(parent);
 
 	if(data->hasFormat("application/x-fatrat-transfer"))
 	{
 		g_queuesLock.lockForRead();
-		
+
 		QByteArray encodedData = data->data("application/x-fatrat-transfer");
 		QDataStream stream(&encodedData, QIODevice::ReadOnly);
 		int queueFrom;
 		QList<int> transfers;
 		QList<Transfer*> objects;
 		Queue* q;
-		
+
 		stream >> queueFrom >> transfers;
-		
+
 		if(queueFrom != queueTo && queueTo < g_queues.size())
 		{
 			q = g_queues[queueFrom];
 			q->lockW();
-			
+
 			for(int i=0;i<transfers.size();i++)
 				objects << q->take(transfers[i]-i, true);
-			
+
 			q->unlock();
-			
+
 			q = g_queues[queueTo];
 			q->add(objects);
 		}
-		
+
 		g_queuesLock.unlock();
 	}
 	else if(data->hasFormat("text/plain"))
@@ -100,9 +100,9 @@ void QueueView::mouseMoveEvent(QMouseEvent* event)
 {
 	if(!getSettingsValue("queue_tooltips").toBool())
 		return;
-	
+
 	QTreeWidgetItem* item = itemAt(event->pos());
-	
+
 	if(!item)
 	{
 		if(m_status != 0)
@@ -114,7 +114,7 @@ void QueueView::mouseMoveEvent(QMouseEvent* event)
 	else
 	{
 		Queue* q = static_cast<Queue*>( item->data(0, Qt::UserRole).value<void*>() );
-		
+
 		if(!m_status || q != m_status->getQueue())
 		{
 			if(m_status)
@@ -122,7 +122,7 @@ void QueueView::mouseMoveEvent(QMouseEvent* event)
 			m_status = new QueueToolTip(getMainWindow(), q);
 			connect(m_status, SIGNAL(destroyed(QObject*)), this, SLOT(tooltipDestroyed(QObject*)));
 		}
-		
+
 		m_status->move(mapToGlobal(event->pos()) + QPoint(25, 25));
 		if(!m_status->isVisible())
 		{

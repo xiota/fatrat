@@ -55,7 +55,7 @@ int KqueuePoller::addSocket(int socket, int flags)
 	struct kevent ev;
 	int eflags = EV_ADD | EV_ENABLE;
 	int efilters = 0;
-	
+
 	if(flags & PollerIn)
 		efilters |= EVFILT_READ;
 	if(flags & PollerOut)
@@ -64,7 +64,7 @@ int KqueuePoller::addSocket(int socket, int flags)
 		eflags |= EV_ONESHOT;
 	if(flags & PollerHup)
 		eflags |= EV_EOF;
-	
+
 	EV_SET(&ev, socket, efilters, eflags, 0, 0, 0);
 	return kevent(m_kqueue, &ev, 1, 0, 0, 0);
 }
@@ -80,12 +80,12 @@ int KqueuePoller::wait(int msec, Event* ev, int max)
 {
 	struct kevent* evlist = (struct kevent*) alloca(sizeof(struct kevent) * max);
 	struct timespec tspec = { msec/1000, (msec%1000)*1000000L };
-	
+
 	int nev = kevent(m_kqueue, 0, 0, evlist, max, &tspec);
 	for(int i=0;i<nev;i++)
 	{
 		Event event = { evlist[i].ident, 0 };
-		
+
 		if(evlist[i].flags & EV_ERROR)
 			event.flags |= PollerError;
 		if(evlist[i].flags & EV_EOF)
@@ -94,10 +94,10 @@ int KqueuePoller::wait(int msec, Event* ev, int max)
 			event.flags |= PollerIn;
 		if(evlist[i].filter & EVFILT_WRITE)
 			event.flags |= PollerOut;
-		
+
 		ev[i] = event;
 	}
-	
+
 	return nev;
 }
 

@@ -737,39 +737,39 @@ QVariant XmlRpcService::Queue_addTransfers(QList<QVariant>& args)
 	int down = args[6].toInt();
 	int up = args[7].toInt();
 	QReadLocker r(&g_queuesLock);
-	
+
 	const Transfer::Mode mode = (upload) ? Transfer::Upload : Transfer::Download;
-	
+
 	Queue* q;
 	HttpService::findQueue(uuidQueue, &q);
 
 	if (!q)
 		throw XmlRpcError(101, "Invalid queue UUID");
-	
+
 	int detectedClass = -1;
 	QList<Transfer*> listTransfers;
 	QStringList uuids;
 
 	if (!_class.isEmpty())
 		detectedClass = Transfer::getEngineID(_class, mode);
-	
+
 	try
 	{
 		for(int i=0;i<uris.size();i++)
 		{
 			Transfer* d;
-			
+
 			int classID;
 			if(detectedClass == -1)
 			{
 				// autodetection
 				Transfer::BestEngine eng;
-				
+
 				if(mode == Transfer::Download)
 					eng = Transfer::bestEngine(uris[i], Transfer::Download);
 				else
 					eng = Transfer::bestEngine(target, Transfer::Upload);
-				
+
 				if(eng.nClass < 0)
 					throw XmlRpcError(401, QObject::tr("Couldn't autodetect transfer type for \"%1\"").arg(uris[i]));
 				else
@@ -780,29 +780,29 @@ QVariant XmlRpcService::Queue_addTransfers(QList<QVariant>& args)
 			}
 			else
 				classID = detectedClass;
-			
+
 			d = TransferFactory::instance()->createInstance(Transfer::getEngineName(classID, mode));
-			
+
 			if(d == 0)
 				throw XmlRpcError(402, QObject::tr("Failed to create a class instance."));
-			
+
 			listTransfers << d;
-			
+
 			TransferFactory::instance()->init(d, uris[i].trimmed(), target);
 			d->setUserSpeedLimits(down, up);
-			
+
 			if (paused)
 				TransferFactory::instance()->setState(d, Transfer::Paused);
 			else
 				TransferFactory::instance()->setState(d, Transfer::Waiting);
 			uuids << d->uuid();
 		}
-		
+
 		q->lockW();
-		
+
 		foreach (Transfer* t, listTransfers)
 			q->add(t);
-		
+
 		q->unlock();
 	}
 	catch (const RuntimeException& e)
@@ -810,7 +810,7 @@ QVariant XmlRpcService::Queue_addTransfers(QList<QVariant>& args)
 		qDeleteAll(listTransfers);
 		throw XmlRpcError(999, e.what());
 	}
-	
+
 	return uuids;
 }
 
@@ -827,11 +827,11 @@ QVariant XmlRpcService::Queue_addTransferWithData(QList<QVariant>& args)
 	int down = args[7].toInt();
 	int up = args[8].toInt();
 	QReadLocker l(&g_queuesLock);
-	
+
 	QTemporaryFile tempFile;
 	if (!tempFile.open())
 		throw XmlRpcError(403, QObject::tr("Cannot create a temporary file."));
-	
+
 	tempFile.write(fileData);
 	tempFile.flush();
 
@@ -840,7 +840,7 @@ QVariant XmlRpcService::Queue_addTransferWithData(QList<QVariant>& args)
 
 	if (!q)
 		throw XmlRpcError(101, "Invalid queue UUID");
-	
+
 	if (_class.isEmpty())
 	{
 		if (Transfer::BestEngine be = Transfer::bestEngine(origName, Transfer::Download))
@@ -873,7 +873,7 @@ QVariant XmlRpcService::Queue_addTransferWithData(QList<QVariant>& args)
 		delete t;
 		throw XmlRpcError(999, e.what());
 	}
-	
+
 	return t->uuid();
 }
 

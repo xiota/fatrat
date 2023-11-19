@@ -33,9 +33,9 @@ class KqueuePoller : public Poller
 public:
 	KqueuePoller(QObject* object);
 	virtual ~KqueuePoller();
-	
+
 	virtual int handle();
-	
+
 	virtual int addSocket(int socket, int flags);
 	virtual int removeSocket(int socket);
 	virtual int wait(int msec, Event* ev, int max);

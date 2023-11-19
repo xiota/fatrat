@@ -38,7 +38,7 @@ void QueueToolTip::fill()
 	QString text;
 	const Queue::Stats& stats = m_queue->m_stats;
 	QPoint diff = QCursor::pos() - pos() + QPoint(25, 25);
-	
+
 	if(abs(diff.x()) > 5 || abs(diff.y()) > 5)
 		hide();
 	else

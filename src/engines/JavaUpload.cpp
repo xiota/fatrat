@@ -60,12 +60,12 @@ JavaUpload::~JavaUpload()
 	curl_formfree(m_postData);
 	m_postData = 0;
 }
-	
+
 void JavaUpload::globalInit()
 {
 	if (!JVM::JVMAvailable())
 		return;
-	
+
 	// locate Java plugins
 	try
 	{
@@ -154,7 +154,7 @@ void JavaUpload::setObject(QString source)
 {
 	m_strSource = source;
 	m_nTotal = QFileInfo(source).size();
-	
+
 	// derive name
 	int pos = m_strSource.lastIndexOf('/');
 	if (pos < 0)
@@ -166,7 +166,7 @@ void JavaUpload::setObject(QString source)
 void JavaUpload::changeActive(bool nowActive)
 {
 	m_buffer.clear();
-	
+
 	if (nowActive)
 	{
 		m_file.setFileName(m_strSource);
@@ -176,7 +176,7 @@ void JavaUpload::changeActive(bool nowActive)
 			setState(Failed);
 			return;
 		}
-		
+
 		// call Java
 		m_plugin->call("processFile", JSignature().addString(), JArgs() << m_strSource);
 	}
@@ -184,10 +184,10 @@ void JavaUpload::changeActive(bool nowActive)
 	{
 		CurlPoller::instance()->removeTransfer(this, true);
 		resetStatistics();
-		
+
 		if(m_curl)
 			m_curl = 0;
-		
+
 		if(m_postData)
 		{
 			curl_formfree(m_postData);
@@ -205,7 +205,7 @@ void JavaUpload::setSpeedLimits(int, int up)
 void JavaUpload::speeds(int& down, int& up) const
 {
 	down = up = 0;
-	
+
 	if (m_curl)
 		CurlUser::speeds(down, up);
 }
@@ -224,7 +224,7 @@ void JavaUpload::load(const QDomNode& map)
 	setObject(getXMLProperty(map, "jplugin_source"));
 	m_nDone = getXMLProperty(map, "jplugin_done").toLongLong();
 	loadVars(map);
-	
+
 	Transfer::load(map);
 }
 
@@ -233,7 +233,7 @@ void JavaUpload::save(QDomDocument& doc, QDomNode& map) const
 	Transfer::save(doc, map);
 
 	saveVars(doc, map);
-	
+
 	setXMLProperty(doc, map, "jplugin_source", m_strSource);
 	setXMLProperty(doc, map, "jplugin_done", QString::number(m_nDone));
 }
@@ -247,7 +247,7 @@ void JavaUpload::curlInit()
 {
 	if(m_curl)
 		curl_easy_cleanup(m_curl);
-	
+
 	m_curl = curl_easy_init();
 	//curl_easy_setopt(m_curl, CURLOPT_POST, true);
 	if(getSettingsValue("httpftp/forbidipv6").toInt() != 0)
@@ -267,7 +267,7 @@ void JavaUpload::curlInit()
 	curl_easy_setopt(m_curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
 	curl_easy_setopt(m_curl, CURLOPT_HEADERFUNCTION, process_header);
 	curl_easy_setopt(m_curl, CURLOPT_WRITEHEADER, this);
-	
+
 	if(m_postData)
 	{
 		curl_formfree(m_postData);
@@ -279,10 +279,10 @@ size_t JavaUpload::process_header(const char* ptr, size_t size, size_t nmemb, Ja
 {
 	QByteArray line = QByteArray(ptr, size*nmemb).trimmed();
 	int pos = line.indexOf(": ");
-	
+
 	if(pos != -1)
 		This->m_headers[line.left(pos).toLower()] = line.mid(pos+2);
-	
+
 	return size*nmemb;
 }
 
@@ -332,7 +332,7 @@ bool JavaUpload::writeData(const char* buffer, size_t bytes)
 void JavaUpload::putDownloadLink(QString downloadLink, QString killLink)
 {
 	enterLogMessage(tr("Download link: %1").arg(downloadLink));
-	
+
 	if (!killLink.isEmpty())
 		enterLogMessage(tr("Kill link: %1").arg(killLink));
 	setState(Completed);
@@ -341,14 +341,14 @@ void JavaUpload::putDownloadLink(QString downloadLink, QString killLink)
 void JavaUpload::startUpload(QString url, QList<JavaUpload::MimePart>& parts, qint64 offset, qint64 bytes)
 {
 	curl_httppost* lastData = 0;
-	
+
 	curlInit();
 	qDebug() << "JavaUpload::startUpload:" << url;
-	
+
 	foreach (const MimePart& part, parts)
 	{
 		QByteArray fieldName = part.name.toUtf8();
-		
+
 		if (!part.filePart)
 		{
 			QByteArray value = part.value.toUtf8();
@@ -375,11 +375,11 @@ void JavaUpload::startUpload(QString url, QList<JavaUpload::MimePart>& parts, qi
 				CURLFORM_CONTENTSLENGTH, m_nThisPart, CURLFORM_END);
 		}
 	}
-	
+
 	QByteArray ba = url.toUtf8();
 	curl_easy_setopt(m_curl, CURLOPT_URL, ba.constData());
 	curl_easy_setopt(m_curl, CURLOPT_HTTPPOST, m_postData);
-	
+
 	CurlPoller::instance()->addTransfer(this);
 }
 

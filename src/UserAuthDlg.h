@@ -44,14 +44,14 @@ public:
 	int exec()
 	{
 		int r;
-		
+
 		lineRegExp->setVisible(m_bRegExpMode);
 		labelRegExp->setVisible(m_bRegExpMode);
-		
+
 		lineRegExp->setText(m_auth.strRegExp);
 		lineUser->setText(m_auth.strUser);
 		linePassword->setText(m_auth.strPassword);
-		
+
 		if((r = QDialog::exec()) == QDialog::Accepted)
 		{
 			m_auth.strRegExp = lineRegExp->text();

@@ -55,7 +55,7 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	QVariant data(const QModelIndex &index, int role) const;
 	bool hasChildren ( const QModelIndex & parent = QModelIndex() ) const;
-	
+
 	void refresh();
 private:
 	TorrentDownload* m_download;

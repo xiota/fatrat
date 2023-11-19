@@ -47,7 +47,7 @@ public slots:
 private:
 	QList<Proxy> m_listProxy;
 	QUuid m_defaultProxy;
-	
+
 	QList<Auth> m_listAuth;
 };
 

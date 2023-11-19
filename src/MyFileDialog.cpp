@@ -33,7 +33,7 @@ extern QSettings* g_settings;
 QString MyFileDialog::getExistingDirectory(QWidget* parent, QString caption, QString dir)
 {
 	QFileDialog dlg(parent, caption, dir);
-	
+
 	dlg.setFileMode(QFileDialog::Directory);
 	if(dlg.exec() == QDialog::Accepted)
 		return dlg.directory().absolutePath();

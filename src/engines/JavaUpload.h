@@ -48,18 +48,18 @@ Q_OBJECT
 public:
 	JavaUpload(const char* clsName);
 	virtual ~JavaUpload();
-	
+
 	static void globalInit();
 	static void applySettings();
 	static Transfer* createInstance(const EngineEntry* e) { return new JavaUpload(e->shortName); }
 	static int acceptable(QString url, bool, const EngineEntry* e);
-	
+
 	virtual void init(QString source, QString target);
 	virtual void setObject(QString source);
-	
+
 	virtual void changeActive(bool nowActive);
 	virtual void setSpeedLimits(int, int up);
-	
+
 	virtual QString object() const { return m_strSource; }
 	virtual QString myClass() const { return m_strClass; }
 	virtual QString name() const { return m_strName; }
@@ -68,25 +68,25 @@ public:
 	virtual void speeds(int& down, int& up) const;
 	virtual qulonglong total() const { return m_nTotal; }
 	virtual qulonglong done() const;
-	
+
 	virtual void load(const QDomNode& map);
 	virtual void save(QDomDocument& doc, QDomNode& map) const;
 protected:
 	void curlInit();
-	
+
 	virtual CURL* curlHandle();
 	virtual void transferDone(CURLcode result);
 	virtual size_t readData(char* buffer, size_t maxData);
 	virtual bool writeData(const char* buffer, size_t bytes);
-	
+
 	static size_t process_header(const char* ptr, size_t size, size_t nmemb, JavaUpload* This);
-	
+
 	struct MimePart
 	{
 		QString name, value;
 		bool filePart;
 	};
-	
+
 	void putDownloadLink(QString downloadLink, QString killLink);
 	void startUpload(QString url, QList<MimePart>& parts, qint64 offset, qint64 bytes);
 private slots:
@@ -111,7 +111,7 @@ private:
 	curl_httppost* m_postData;
 	QMap<QString,QString> m_headers;
 	char m_fileName[256];
-	
+
 	friend class JUploadPlugin;
 };
 

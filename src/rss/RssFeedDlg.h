@@ -38,14 +38,14 @@ public:
 	{
 		setupUi(this);
 	}
-	
+
 	int exec()
 	{
 		int r;
-		
+
 		lineName->setText(m_strName);
 		lineURL->setText(m_strURL);
-		
+
 		if((r = QDialog::exec()) == QDialog::Accepted)
 		{
 			m_strName = lineName->text();
@@ -53,13 +53,13 @@ public:
 		}
 		return r;
 	}
-	
+
 	void accept()
 	{
 		if(!lineName->text().isEmpty() && !lineURL->text().isEmpty())
 			QDialog::accept();
 	}
-	
+
 	QString m_strName, m_strURL;
 };
 

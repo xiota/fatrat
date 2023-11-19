@@ -38,9 +38,9 @@ Q_OBJECT
 public:
 	QueueMgr();
 	void exit();
-	
+
 	static QueueMgr* instance() { return m_instance; }
-	
+
 	inline int totalDown() const { return m_down; }
 	inline int totalUp() const { return m_up; }
 

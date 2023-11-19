@@ -169,7 +169,7 @@ QVariant TorrentPeersModel::data ( const QModelIndex &index, int role ) const
 					if ( info.pieces[i] )
 						pcs++;
 				QString pct = QString ( "%1%" ).arg ( ( int ) ( 100.0/double ( info.pieces.size() ) *pcs ) );
-				
+
 				if(info.flags & libtorrent::peer_info::seed)
 					pct += " S";
 				return pct;

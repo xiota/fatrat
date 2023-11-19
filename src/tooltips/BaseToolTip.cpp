@@ -38,7 +38,7 @@ BaseToolTip::BaseToolTip(QObject* master, QWidget* parent)
 	if(master != 0)
 		connect(master, SIGNAL(destroyed(QObject*)), this, SLOT(deleteLater()));
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(doRefresh()));
-	
+
 	m_timer.start(1000);
 	QMetaObject::invokeMethod(this, "doRefresh", Qt::QueuedConnection);
 }
@@ -53,7 +53,7 @@ void BaseToolTip::placeMe() // from Qt
 	QPoint pos = QCursor::pos();
 	int s = QApplication::desktop()->screenNumber(pos);
 	QRect screen = QApplication::desktop()->screenGeometry(s);
-	
+
 	QPoint p = pos;
 	p += QPoint(2, 16);
 	if (p.x() + this->width() > screen.x() + screen.width())
@@ -68,6 +68,6 @@ void BaseToolTip::placeMe() // from Qt
 		p.setX(screen.x());
 	if (p.y() + this->height() > screen.y() + screen.height())
 		p.setY(screen.y() + screen.height() - this->height());
-	
+
 	move(p);
 }

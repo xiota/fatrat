@@ -45,7 +45,7 @@ public slots:
 protected:
 	void mousePressEvent(QMouseEvent* event);
 	void mouseDoubleClickEvent(QMouseEvent* event);
-	
+
 	int m_nSpeed;
 	bool m_bUpload;
 };

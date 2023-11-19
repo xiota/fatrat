@@ -50,7 +50,7 @@ Q_OBJECT
 public:
 	MainWindow(bool bStartHidden);
 	~MainWindow();
-	
+
 	void setupUi();
 	void move(int i);
 	void changeAll(bool resume);
@@ -62,7 +62,7 @@ public slots:
 	void about();
 	void showSettings();
 	void saveWindowState();
-	
+
 	void updateUi();
 	void newQueue();
 	void deleteQueue();
@@ -71,20 +71,20 @@ public slots:
 	void deleteTransferData();
 	void refreshQueues();
 	void refreshDetailsTab();
-	
+
 	void currentTabChanged(int newTab);
-	
+
 	void moveToTop();
 	void moveUp();
 	void moveDown();
 	void moveToBottom();
-	
+
 	void toggleInfoBar(bool show);
 	void hideAllInfoBars();
-	
+
 	void resumeAll();
 	void stopAll();
-	
+
 	void resumeTransfer();
 	void forcedResumeTransfer();
 	void pauseTransfer();
@@ -92,31 +92,31 @@ public slots:
 	void copyRemoteURI();
 
 	void pauseAllTransfers();
-	
+
 	void transferOptions();
 	void removeCompleted();
-	
+
 	void queueItemActivated();
 	void queueItemProperties();
 	void queueItemContext(const QPoint& pos);
-	
+
 	void transferItemActivated();
 	void transferItemDoubleClicked(const QModelIndex&);
 	void transferItemContext(const QPoint& pos);
-	
+
 	void transferOpenFile();
 	void transferOpenDirectory();
-	
+
 	void displayDestroyed();
 	void menuActionTriggered();
-	
+
 	void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 	void downloadStateChanged(Transfer* d, Transfer::State prev, Transfer::State now);
 	void downloadModeChanged(Transfer* d, Transfer::Mode prev, Transfer::Mode now);
-	
+
 	void reconfigure();
 	void showWindow(bool);
-	
+
 	void showHelp();
 	void reportBug();
 	void filterTextChanged(const QString& text);
@@ -140,12 +140,12 @@ protected:
 	virtual void hideEvent(QHideEvent* event);
 	virtual void dragEnterEvent(QDragEnterEvent *event);
 	virtual void dropEvent(QDropEvent *event);
-	
+
 	void restoreWindowState(bool bStartHidden);
 	void connectActions();
 	void fillSettingsMenu();
 	void setupTrayIconMenu();
-	
+
 	void showTrayIcon();
 	void transferOpen(bool bOpenFile);
 	void initAppTools(QMenu* menu);
@@ -171,12 +171,12 @@ private:
 	QTimer m_extensionCheckTimer;
 	bool m_bUpdatesBubbleManuallyClosed;
 #endif
-	
+
 	QList<QAction*> m_menuActionObjects;
 	ClipboardMonitor* m_clipboardMonitor;
 public:
 	int m_nStatusWidgetsLeft, m_nStatusWidgetsRight;
-	
+
 	friend class DropBox;
 	friend class SpeedLimitWidget;
 	friend class RightClickLabel;
