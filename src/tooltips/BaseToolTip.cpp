@@ -26,6 +26,7 @@ respects for all of the code used other than "OpenSSL".
 
 #include "BaseToolTip.h"
 #include <QApplication>
+#include <QScreen>
 
 BaseToolTip::BaseToolTip(QObject* master, QWidget* parent)
 	: QLabel(parent)
@@ -50,8 +51,8 @@ void BaseToolTip::mousePressEvent(QMouseEvent*)
 void BaseToolTip::placeMe() // from Qt
 {
 	QPoint pos = QCursor::pos();
-	int s = QApplication::desktop()->screenNumber(pos);
-	QRect screen = QApplication::desktop()->screenGeometry(s);
+	int s = QGuiApplication::primaryScreen()->screenNumber(pos);
+	QRect screen = QGuiApplication::primaryScreen()->geometry();
 
 	QPoint p = pos;
 	p += QPoint(2, 16);

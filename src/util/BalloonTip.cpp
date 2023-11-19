@@ -12,6 +12,7 @@
 #include <QBitmap>
 #include <QPainter>
 #include <QPainterPath>
+#include <QScreen>
 #include <QApplication>
 
 BalloonTip::BalloonTip(QWidget* parent, QIcon si, const QString& title, const QString& message)
@@ -45,7 +46,7 @@ BalloonTip::BalloonTip(QWidget* parent, QIcon si, const QString& title, const QS
     msgLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     // smart size for the message label
-    int limit = QApplication::desktop()->availableGeometry(msgLabel).size().width() / 3;
+	 int limit = QGuiApplication::primaryScreen()->availableGeometry(msgLabel).geometry().size().width() / 3;
 
     if (msgLabel->sizeHint().width() > limit) {
 	msgLabel->setWordWrap(true);
@@ -112,7 +113,7 @@ void BalloonTip::resizeEvent(QResizeEvent *ev)
 
 void BalloonTip::balloon(const QPoint& pos, int msecs, bool showArrow)
 {
-    QRect scr = QApplication::desktop()->screenGeometry(pos);
+    QRect scr = QGuiApplication::screenAt(pos)->geometry();
     QSize sh = sizeHint();
     const int border = 1;
     const int ah = 18, ao = 18, aw = 18, rc = 7;
