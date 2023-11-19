@@ -24,125 +24,115 @@ executables. You must obey the GNU General Public License in all
 respects for all of the code used other than "OpenSSL".
 */
 
-#include "config.h"
 #include "HttpFtpSettings.h"
-#include "UserAuthDlg.h"
-#include "Settings.h"
-#include "engines/CurlPoller.h"
+
 #include <QMessageBox>
 
-HttpFtpSettings::HttpFtpSettings(QWidget* w, QObject* parent)
-	: QObject(parent)
-{
-	setupUi(w);
+#include "Settings.h"
+#include "UserAuthDlg.h"
+#include "config.h"
+#include "engines/CurlPoller.h"
 
-	connect(pushAuthAdd, SIGNAL(clicked()), this, SLOT(authAdd()));
-	connect(pushAuthEdit, SIGNAL(clicked()), this, SLOT(authEdit()));
-	connect(pushAuthDelete, SIGNAL(clicked()), this, SLOT(authDelete()));
+HttpFtpSettings::HttpFtpSettings(QWidget* w, QObject* parent)
+    : QObject(parent) {
+  setupUi(w);
+
+  connect(pushAuthAdd, SIGNAL(clicked()), this, SLOT(authAdd()));
+  connect(pushAuthEdit, SIGNAL(clicked()), this, SLOT(authEdit()));
+  connect(pushAuthDelete, SIGNAL(clicked()), this, SLOT(authDelete()));
 }
 
-void HttpFtpSettings::load()
-{
-	bool bFound = false;
+void HttpFtpSettings::load() {
+  bool bFound = false;
 
-	checkForbidIPv6->setChecked(getSettingsValue("httpftp/forbidipv6").toBool());
+  checkForbidIPv6->setChecked(getSettingsValue("httpftp/forbidipv6").toBool());
 
-	// LOAD PROXYS
-	m_listProxy = Proxy::loadProxys();
-	m_defaultProxy = getSettingsValue("httpftp/defaultproxy").toString();
+  // LOAD PROXYS
+  m_listProxy = Proxy::loadProxys();
+  m_defaultProxy = getSettingsValue("httpftp/defaultproxy").toString();
 
-	comboDefaultProxy->clear();
-	comboDefaultProxy->addItem(tr("None", "No proxy"));
-	for(int i=0;i<m_listProxy.size();i++)
-	{
-		comboDefaultProxy->addItem(m_listProxy[i].toString());
-		if(m_listProxy[i].uuid == m_defaultProxy)
-		{
-			comboDefaultProxy->setCurrentIndex(i+1);
+  comboDefaultProxy->clear();
+  comboDefaultProxy->addItem(tr("None", "No proxy"));
+  for (int i = 0; i < m_listProxy.size(); i++) {
+    comboDefaultProxy->addItem(m_listProxy[i].toString());
+    if (m_listProxy[i].uuid == m_defaultProxy) {
+      comboDefaultProxy->setCurrentIndex(i + 1);
 
-			bFound = true;
-		}
-	}
+      bFound = true;
+    }
+  }
 
-	if(!bFound)
-		m_defaultProxy = QUuid();
+  if (!bFound) m_defaultProxy = QUuid();
 
-	// LOAD AUTHs
-	m_listAuth = Auth::loadAuths();
+  // LOAD AUTHs
+  m_listAuth = Auth::loadAuths();
 
-	listAuths->clear();
-	foreach(Auth a, m_listAuth)
-		listAuths->addItem(a.strRegExp);
+  listAuths->clear();
+  foreach (Auth a, m_listAuth) listAuths->addItem(a.strRegExp);
 
-	lineConnectionTimeout->setText(getSettingsValue("httpftp/timeout").toString());
-	checkDetectTorrents->setChecked(getSettingsValue("httpftp/detect_torrents").toBool());
+  lineConnectionTimeout->setText(
+      getSettingsValue("httpftp/timeout").toString());
+  checkDetectTorrents->setChecked(
+      getSettingsValue("httpftp/detect_torrents").toBool());
 #ifndef WITH_BITTORRENT
-	checkDetectTorrents->setDisabled(true);
+  checkDetectTorrents->setDisabled(true);
 #endif
 }
 
-void HttpFtpSettings::accepted()
-{
-	int index = comboDefaultProxy->currentIndex();
-	if(!index)
-		m_defaultProxy = QUuid();
-	else
-		m_defaultProxy = m_listProxy[index-1].uuid;
-	setSettingsValue("httpftp/defaultproxy", m_defaultProxy.toString());
+void HttpFtpSettings::accepted() {
+  int index = comboDefaultProxy->currentIndex();
+  if (!index)
+    m_defaultProxy = QUuid();
+  else
+    m_defaultProxy = m_listProxy[index - 1].uuid;
+  setSettingsValue("httpftp/defaultproxy", m_defaultProxy.toString());
 
-	Auth::saveAuths(m_listAuth);
-	setSettingsValue("httpftp/forbidipv6", checkForbidIPv6->isChecked());
+  Auth::saveAuths(m_listAuth);
+  setSettingsValue("httpftp/forbidipv6", checkForbidIPv6->isChecked());
 
-	bool ok;
-	int timeout = lineConnectionTimeout->text().toInt(&ok);
-	if (!ok || timeout <= 0)
-		timeout = 20;
+  bool ok;
+  int timeout = lineConnectionTimeout->text().toInt(&ok);
+  if (!ok || timeout <= 0) timeout = 20;
 
-	setSettingsValue("httpftp/timeout", timeout);
-	lineConnectionTimeout->setText(QString::number(timeout));
+  setSettingsValue("httpftp/timeout", timeout);
+  lineConnectionTimeout->setText(QString::number(timeout));
 
-	setSettingsValue("httpftp/detect_torrents", checkDetectTorrents->isChecked());
+  setSettingsValue("httpftp/detect_torrents", checkDetectTorrents->isChecked());
 
-	CurlPoller::setTransferTimeout(timeout);
+  CurlPoller::setTransferTimeout(timeout);
 }
 
-void HttpFtpSettings::authAdd()
-{
-	UserAuthDlg dlg(true, pushAuthAdd->parentWidget());
+void HttpFtpSettings::authAdd() {
+  UserAuthDlg dlg(true, pushAuthAdd->parentWidget());
 
-	if(dlg.exec() == QDialog::Accepted)
-	{
-		m_listAuth << dlg.m_auth;
-		listAuths->addItem(dlg.m_auth.strRegExp);
-	}
+  if (dlg.exec() == QDialog::Accepted) {
+    m_listAuth << dlg.m_auth;
+    listAuths->addItem(dlg.m_auth.strRegExp);
+  }
 }
 
-void HttpFtpSettings::authEdit()
-{
-	int index = listAuths->currentRow();
-	if(index < 0)
-		return;
+void HttpFtpSettings::authEdit() {
+  int index = listAuths->currentRow();
+  if (index < 0) return;
 
-	UserAuthDlg dlg(true, pushAuthAdd->parentWidget());
-	dlg.m_auth = m_listAuth[index];
+  UserAuthDlg dlg(true, pushAuthAdd->parentWidget());
+  dlg.m_auth = m_listAuth[index];
 
-	if(dlg.exec() == QDialog::Accepted)
-	{
-		m_listAuth[index] = dlg.m_auth;
-		listAuths->currentItem()->setText(dlg.m_auth.strRegExp);
-	}
+  if (dlg.exec() == QDialog::Accepted) {
+    m_listAuth[index] = dlg.m_auth;
+    listAuths->currentItem()->setText(dlg.m_auth.strRegExp);
+  }
 }
 
-void HttpFtpSettings::authDelete()
-{
-	int index = listAuths->currentRow();
-	if(index < 0)
-		return;
+void HttpFtpSettings::authDelete() {
+  int index = listAuths->currentRow();
+  if (index < 0) return;
 
-	if(QMessageBox::warning(pushAuthAdd->parentWidget(), tr("Delete user credentials"), tr("Do you really want to delete the selected user credentials?"),
-	   QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
-	{
-		delete listAuths->takeItem(index);
-		m_listAuth.removeAt(index);
-	}
+  if (QMessageBox::warning(
+          pushAuthAdd->parentWidget(), tr("Delete user credentials"),
+          tr("Do you really want to delete the selected user credentials?"),
+          QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+    delete listAuths->takeItem(index);
+    m_listAuth.removeAt(index);
+  }
 }

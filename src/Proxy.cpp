@@ -25,84 +25,76 @@ respects for all of the code used other than "OpenSSL".
 */
 
 #include "Proxy.h"
+
 #include <QSettings>
 #include <QtDebug>
 
 extern QSettings* g_settings;
 
-QList<Proxy> Proxy::loadProxys()
-{
-	QList<Proxy> r;
+QList<Proxy> Proxy::loadProxys() {
+  QList<Proxy> r;
 
-	int count = g_settings->beginReadArray("httpftp/proxys");
-	for(int i=0;i<count;i++)
-	{
-		Proxy p;
-		g_settings->setArrayIndex(i);
+  int count = g_settings->beginReadArray("httpftp/proxys");
+  for (int i = 0; i < count; i++) {
+    Proxy p;
+    g_settings->setArrayIndex(i);
 
-		p.strName = g_settings->value("name").toString();
-		p.strIP = g_settings->value("ip").toString();
-		p.nPort = g_settings->value("port").toUInt();
-		p.strUser = g_settings->value("user").toString();
-		p.strPassword = g_settings->value("password").toString();
-		p.nType = (Proxy::ProxyType) g_settings->value("type",0).toInt();
-		p.uuid = QUuid::fromString(g_settings->value("uuid").toString());
+    p.strName = g_settings->value("name").toString();
+    p.strIP = g_settings->value("ip").toString();
+    p.nPort = g_settings->value("port").toUInt();
+    p.strUser = g_settings->value("user").toString();
+    p.strPassword = g_settings->value("password").toString();
+    p.nType = (Proxy::ProxyType)g_settings->value("type", 0).toInt();
+    p.uuid = QUuid::fromString(g_settings->value("uuid").toString());
 
-		r << p;
-	}
-	g_settings->endArray();
-	return r;
+    r << p;
+  }
+  g_settings->endArray();
+  return r;
 }
 
+Proxy Proxy::getProxy(QUuid uuid) {
+  if (uuid.isNull()) return Proxy();
 
-Proxy Proxy::getProxy(QUuid uuid)
-{
-	if(uuid.isNull())
-		return Proxy();
+  int count = g_settings->beginReadArray("httpftp/proxys");
+  for (int i = 0; i < count; i++) {
+    Proxy p;
+    g_settings->setArrayIndex(i);
 
-	int count = g_settings->beginReadArray("httpftp/proxys");
-	for(int i=0;i<count;i++)
-	{
-		Proxy p;
-		g_settings->setArrayIndex(i);
+    p.uuid = QUuid::fromString(g_settings->value("uuid").toString());
+    if (p.uuid != uuid) continue;
 
-		p.uuid = QUuid::fromString(g_settings->value("uuid").toString());
-		if(p.uuid != uuid)
-			continue;
+    p.strName = g_settings->value("name").toString();
+    p.strIP = g_settings->value("ip").toString();
+    p.nPort = g_settings->value("port").toUInt();
+    p.strUser = g_settings->value("user").toString();
+    p.strPassword = g_settings->value("password").toString();
+    p.nType = (Proxy::ProxyType)g_settings->value("type", 0).toInt();
 
-		p.strName = g_settings->value("name").toString();
-		p.strIP = g_settings->value("ip").toString();
-		p.nPort = g_settings->value("port").toUInt();
-		p.strUser = g_settings->value("user").toString();
-		p.strPassword = g_settings->value("password").toString();
-		p.nType = (Proxy::ProxyType) g_settings->value("type",0).toInt();
+    g_settings->endArray();
+    return p;
+  }
 
-		g_settings->endArray();
-		return p;
-	}
-
-	g_settings->endArray();
-	return Proxy();
+  g_settings->endArray();
+  return Proxy();
 }
 
-Proxy::operator QNetworkProxy() const
-{
-	QNetworkProxy::ProxyType t;
+Proxy::operator QNetworkProxy() const {
+  QNetworkProxy::ProxyType t;
 
-	if(nType == ProxyHttp)
-		t = QNetworkProxy::HttpProxy;
-	else if(nType == ProxySocks5)
-		t = QNetworkProxy::Socks5Proxy;
-	else
-		t = QNetworkProxy::NoProxy;
+  if (nType == ProxyHttp)
+    t = QNetworkProxy::HttpProxy;
+  else if (nType == ProxySocks5)
+    t = QNetworkProxy::Socks5Proxy;
+  else
+    t = QNetworkProxy::NoProxy;
 
-	QNetworkProxy p(t);
+  QNetworkProxy p(t);
 
-	p.setHostName(strIP);
-	p.setPort(nPort);
-	p.setUser(strUser);
-	p.setPassword(strPassword);
+  p.setHostName(strIP);
+  p.setPort(nPort);
+  p.setUser(strUser);
+  p.setPassword(strPassword);
 
-	return p;
+  return p;
 }
-

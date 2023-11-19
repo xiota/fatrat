@@ -26,62 +26,58 @@ respects for all of the code used other than "OpenSSL".
 
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
-#include <QUuid>
+#include <QDateTime>
 #include <QString>
 #include <QThread>
-#include <QDateTime>
 #include <QTime>
 #include <QTimer>
+#include <QUuid>
 #include <QVariant>
 
 struct ScheduledAction;
 
-class Scheduler : public QObject
-{
-Q_OBJECT
-public:
-	Scheduler();
-	virtual ~Scheduler();
+class Scheduler : public QObject {
+  Q_OBJECT
+ public:
+  Scheduler();
+  virtual ~Scheduler();
 
-	void reload();
+  void reload();
 
-	static void loadActions(QList<ScheduledAction>& list);
-	static void saveActions(const QList<ScheduledAction>& list);
-	static Scheduler* instance() { return m_instance; }
-protected:
-	void executeAction(const ScheduledAction& action);
-private slots:
-	void doWork();
-private:
-	QTimer m_timer;
-	static Scheduler* m_instance;
-	QList<ScheduledAction> m_actions;
+  static void loadActions(QList<ScheduledAction>& list);
+  static void saveActions(const QList<ScheduledAction>& list);
+  static Scheduler* instance() { return m_instance; }
+
+ protected:
+  void executeAction(const ScheduledAction& action);
+ private slots:
+  void doWork();
+
+ private:
+  QTimer m_timer;
+  static Scheduler* m_instance;
+  QList<ScheduledAction> m_actions;
 };
 
-struct ScheduledAction
-{
-	ScheduledAction()
-	{
-		memset(daysRepeated, 1, sizeof(daysRepeated));
-		repeated = true;
-		action = ActionResumeAll;
-		whenRepeated = QTime::currentTime();
-		whenOneTime = QDateTime::currentDateTime();
-	}
+struct ScheduledAction {
+  ScheduledAction() {
+    memset(daysRepeated, 1, sizeof(daysRepeated));
+    repeated = true;
+    action = ActionResumeAll;
+    whenRepeated = QTime::currentTime();
+    whenOneTime = QDateTime::currentDateTime();
+  }
 
-	enum ActionType
-	{
-		ActionResumeAll, ActionStopAll, ActionSetSpeedLimit
-	};
+  enum ActionType { ActionResumeAll, ActionStopAll, ActionSetSpeedLimit };
 
-	QString name;
-	QUuid queue;
-	ActionType action;
-	QVariant actionArgument;
-	QDateTime whenOneTime;
-	QTime whenRepeated;
-	bool daysRepeated[7];
-	bool repeated;
+  QString name;
+  QUuid queue;
+  ActionType action;
+  QVariant actionArgument;
+  QDateTime whenOneTime;
+  QTime whenRepeated;
+  bool daysRepeated[7];
+  bool repeated;
 };
 
 #endif

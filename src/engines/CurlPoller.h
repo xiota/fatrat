@@ -24,69 +24,72 @@ executables. You must obey the GNU General Public License in all
 respects for all of the code used other than "OpenSSL".
 */
 
-
 #ifndef CURL_POLLER
 #define CURL_POLLER
-#include <QThread>
-#include <QMutex>
-#include <QMap>
-#include <QHash>
-#include <QQueue>
 #include <curl/curl.h>
+
+#include <QHash>
+#include <QMap>
+#include <QMutex>
+#include <QQueue>
+#include <QThread>
+
 #include "engines/CurlUser.h"
 #include "poller/Poller.h"
 
 class CurlPollingMaster;
 
-class CurlPoller : public QThread
-{
-public:
-	CurlPoller();
-	~CurlPoller();
+class CurlPoller : public QThread {
+ public:
+  CurlPoller();
+  ~CurlPoller();
 
-	void addTransfer(CurlUser* obj);
-	// will handle the underlying CURL* too
-	void removeTransfer(CurlUser* obj, bool nodeep = false);
-	//void removeSafely(CURL* curl);
-	void addTransfer(CurlPollingMaster* obj);
-	void removeTransfer(CurlPollingMaster* obj);
+  void addTransfer(CurlUser* obj);
+  // will handle the underlying CURL* too
+  void removeTransfer(CurlUser* obj, bool nodeep = false);
+  // void removeSafely(CURL* curl);
+  void addTransfer(CurlPollingMaster* obj);
+  void removeTransfer(CurlPollingMaster* obj);
 
-	void run();
-	void checkErrors(timeval tvNow);
+  void run();
+  void checkErrors(timeval tvNow);
 
-	static CurlPoller* instance() { return m_instance; }
-protected:
-	void epollEnable(int socket, int events);
-	void pollingCycle(bool oneshot);
-	static int socket_callback(CURL* easy, curl_socket_t s, int action, CurlPoller* This, void* socketp);
-	static int timer_callback(CURLM* multi, long newtimeout, long* timeout);
-	static void setTransferTimeout(int timeout);
-	static int getTransferTimeout() { return m_nTransferTimeout; }
-protected:
-	static CurlPoller* m_instance;
-	static int m_nTransferTimeout;
+  static CurlPoller* instance() { return m_instance; }
 
-	bool m_bAbort;
-	CURLM* m_curlm;
-	Poller* m_poller;
-	int m_curlTimeout;
-	long m_timeout;
+ protected:
+  void epollEnable(int socket, int events);
+  void pollingCycle(bool oneshot);
+  static int socket_callback(CURL* easy, curl_socket_t s, int action,
+                             CurlPoller* This, void* socketp);
+  static int timer_callback(CURLM* multi, long newtimeout, long* timeout);
+  static void setTransferTimeout(int timeout);
+  static int getTransferTimeout() { return m_nTransferTimeout; }
 
-	typedef QMap<int, QPair<int,CurlStat*> > sockets_hash;
+ protected:
+  static CurlPoller* m_instance;
+  static int m_nTransferTimeout;
 
-	QMap<CURL*, CurlUser*> m_users;
-	QMap<int, CurlPollingMaster*> m_masters;
-	sockets_hash m_sockets;
-	QMutex m_usersLock;
-	QQueue<CurlUser*> m_queueToDelete;
+  bool m_bAbort;
+  CURLM* m_curlm;
+  Poller* m_poller;
+  int m_curlTimeout;
+  long m_timeout;
 
-	QList<int> m_socketsToRemove;
-	sockets_hash m_socketsToAdd;
+  typedef QMap<int, QPair<int, CurlStat*> > sockets_hash;
 
-	friend class HttpFtpSettings;
-	friend class CurlDownload;
-	friend class CurlPollingMaster;
-	friend class CurlUser;
+  QMap<CURL*, CurlUser*> m_users;
+  QMap<int, CurlPollingMaster*> m_masters;
+  sockets_hash m_sockets;
+  QMutex m_usersLock;
+  QQueue<CurlUser*> m_queueToDelete;
+
+  QList<int> m_socketsToRemove;
+  sockets_hash m_socketsToAdd;
+
+  friend class HttpFtpSettings;
+  friend class CurlDownload;
+  friend class CurlPollingMaster;
+  friend class CurlUser;
 };
 
 #endif

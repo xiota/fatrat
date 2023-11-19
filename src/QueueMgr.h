@@ -26,42 +26,44 @@ respects for all of the code used other than "OpenSSL".
 
 #ifndef _QUEUEMGR_H
 #define _QUEUEMGR_H
+#include <QMap>
+#include <QSettings>
 #include <QThread>
 #include <QTimer>
+
 #include "Queue.h"
-#include <QSettings>
-#include <QMap>
 
-class QueueMgr : public QObject
-{
-Q_OBJECT
-public:
-	QueueMgr();
-	void exit();
+class QueueMgr : public QObject {
+  Q_OBJECT
+ public:
+  QueueMgr();
+  void exit();
 
-	static QueueMgr* instance() { return m_instance; }
+  static QueueMgr* instance() { return m_instance; }
 
-	inline int totalDown() const { return m_down; }
-	inline int totalUp() const { return m_up; }
+  inline int totalDown() const { return m_down; }
+  inline int totalUp() const { return m_up; }
 
-	void pauseAllTransfers();
-	void unpauseAllTransfers();
-	inline bool isAllPaused() { return !m_paused.isEmpty(); }
-private:
-	void doMove(Queue* q, Transfer* t);
-	static Queue* findQueue(Transfer* t);
-public slots:
-	void doWork();
-	void transferStateChanged(Transfer*,Transfer::State,Transfer::State);
-	void transferModeChanged(Transfer*,Transfer::Mode,Transfer::Mode);
-private:
-	static QueueMgr* m_instance;
-	QTimer* m_timer;
-	int m_nCycle;
-	int m_down, m_up;
+  void pauseAllTransfers();
+  void unpauseAllTransfers();
+  inline bool isAllPaused() { return !m_paused.isEmpty(); }
 
-	// for the Pause all feature
-	QMap<QUuid, Transfer::State> m_paused;
+ private:
+  void doMove(Queue* q, Transfer* t);
+  static Queue* findQueue(Transfer* t);
+ public slots:
+  void doWork();
+  void transferStateChanged(Transfer*, Transfer::State, Transfer::State);
+  void transferModeChanged(Transfer*, Transfer::Mode, Transfer::Mode);
+
+ private:
+  static QueueMgr* m_instance;
+  QTimer* m_timer;
+  int m_nCycle;
+  int m_down, m_up;
+
+  // for the Pause all feature
+  QMap<QUuid, Transfer::State> m_paused;
 };
 
 #endif

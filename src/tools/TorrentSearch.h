@@ -26,84 +26,80 @@ respects for all of the code used other than "OpenSSL".
 
 #ifndef TORRENTSEARCH_H
 #define TORRENTSEARCH_H
-#include <QWidget>
 #include <QList>
 #include <QPair>
+#include <QWidget>
+
 #include "ui_TorrentSearch.h"
 
 class QNetworkAccessManager;
 class QNetworkReply;
 
-class TorrentSearch : public QWidget, Ui_TorrentSearch
-{
-Q_OBJECT
-public:
-	TorrentSearch();
-	virtual ~TorrentSearch();
-	static QWidget* create() { return new TorrentSearch; }
-protected:
-	struct RegExpParam
-	{
-		QString regexp;
-		int field, match;
-	};
+class TorrentSearch : public QWidget, Ui_TorrentSearch {
+  Q_OBJECT
+ public:
+  TorrentSearch();
+  virtual ~TorrentSearch();
+  static QWidget* create() { return new TorrentSearch; }
 
-	struct Engine
-	{
-		QString id, name;
-		QString query, postData;
+ protected:
+  struct RegExpParam {
+    QString regexp;
+    int field, match;
+  };
 
-		// parsing blocks
-		QString beginning, splitter, ending;
+  struct Engine {
+    QString id, name;
+    QString query, postData;
 
-		// parsing items
-		QMap<QString,RegExpParam> regexps;
+    // parsing blocks
+    QString beginning, splitter, ending;
 
-		QMap<QString,QString> formats;
+    // parsing items
+    QMap<QString, RegExpParam> regexps;
 
-		QNetworkReply* reply;
+    QMap<QString, QString> formats;
 
-		bool operator<(const Engine& e) const
-		{
-			return this->name < e.name;
-		}
-	};
+    QNetworkReply* reply;
 
-	void updateUi();
-	void loadEngines();
-	void loadEngines(QString path);
-	void parseResults(Engine* e, const QByteArray& data);
-	QString completeUrl(QString url, QString complete);
+    bool operator<(const Engine& e) const { return this->name < e.name; }
+  };
 
-	static QList<QByteArray> splitArray(const QByteArray& src, QString sep);
-signals:
-	void changeTabTitle(QString newTitle);
-public slots:
-	void search();
-	void searchDone(QNetworkReply* reply);
-	void download();
-	void setSearchFocus();
-	void resultsContext(const QPoint&);
-	void openDetails();
-private:
-	QList<Engine> m_engines;
-	QNetworkAccessManager* m_network;
-	bool m_bSearching;
-	int m_nActiveTotal, m_nActiveDone;
+  void updateUi();
+  void loadEngines();
+  void loadEngines(QString path);
+  void parseResults(Engine* e, const QByteArray& data);
+  QString completeUrl(QString url, QString complete);
+
+  static QList<QByteArray> splitArray(const QByteArray& src, QString sep);
+ signals:
+  void changeTabTitle(QString newTitle);
+ public slots:
+  void search();
+  void searchDone(QNetworkReply* reply);
+  void download();
+  void setSearchFocus();
+  void resultsContext(const QPoint&);
+  void openDetails();
+
+ private:
+  QList<Engine> m_engines;
+  QNetworkAccessManager* m_network;
+  bool m_bSearching;
+  int m_nActiveTotal, m_nActiveDone;
 };
 
-class SearchTreeWidgetItem : public QTreeWidgetItem
-{
-public:
-	SearchTreeWidgetItem(QTreeWidget* parent) : QTreeWidgetItem(parent) {}
+class SearchTreeWidgetItem : public QTreeWidgetItem {
+ public:
+  SearchTreeWidgetItem(QTreeWidget* parent) : QTreeWidgetItem(parent) {}
 
-	void parseSize(QString in);
+  void parseSize(QString in);
 
-	QString m_strLink; // torrent download link
-	QString m_strInfo; // info URL
-	qint64 m_nSize; // torrent's data size
-private:
-	bool operator<(const QTreeWidgetItem& other) const;
+  QString m_strLink;  // torrent download link
+  QString m_strInfo;  // info URL
+  qint64 m_nSize;     // torrent's data size
+ private:
+  bool operator<(const QTreeWidgetItem& other) const;
 };
 
 #endif
