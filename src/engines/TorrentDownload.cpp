@@ -127,7 +127,7 @@ int TorrentDownload::acceptable(QString uri, bool) {
     istorrent = false;
 
     for (int i = 0; i < m_listBTLinks.size(); i++) {
-      if (m_listBTLinks[i].exactMatch(uri)) {
+      if (m_listBTLinks[i].match(uri).hasMatch()) {
         istorrent = true;
         break;
       } else

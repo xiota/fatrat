@@ -74,7 +74,7 @@ int JavaExtractor::acceptable(QString uri, bool, const EngineEntry* e) {
                                .arg(QString::fromStdString(en.name))
                                .arg(e.what()));
     }
-  } else if (en.regexp.exactMatch(uri))
+  } else if (en.regexp.match(uri).hasMatch())
     return 3;
 
   return 0;

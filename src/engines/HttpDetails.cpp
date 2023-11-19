@@ -397,7 +397,8 @@ QMap<QString, QStringList> HttpDetails::loadMirrors() {
   while (!file.atEnd()) {
     QString line = file.readLine().trimmed();
     if (line.isEmpty()) continue;
-    if (re.exactMatch(line)) {
+
+    if (re.match(line).hasMatch()) {
       if (!nextGrp.isEmpty()) rv[nextGrp] = list;
       list.clear();
       nextGrp = re.cap(1);

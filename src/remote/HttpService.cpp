@@ -241,7 +241,7 @@ HTTPRequestHandler* HttpService::createRequestHandler(
   m_handlersMutex.lock();
 
   for (const QPair<QRegularExpression, handler_t>& e : m_handlers) {
-    if (e.first.exactMatch(uri)) {
+    if (e.first.match(uri).hasMatch()) {
       m_handlersMutex.unlock();
       return e.second();
     }

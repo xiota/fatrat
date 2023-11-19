@@ -24,6 +24,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <cstring>
 
 #include "CurlPollingMaster.h"
@@ -247,7 +248,7 @@ void UrlClient::processContentDisposition(const QByteArray& con) {
     QString name = con.mid(pos + 9);
 
     QRegularExpression quoted("\"([^\"]+)\".*");
-    if (quoted.exactMatch(name)) name = quoted.cap(1);
+    if (quoted.match(name).hasMatch()) name = quoted.cap(1);
 
     name.replace('/', '_');
     qDebug() << "Automatically renaming to" << name;

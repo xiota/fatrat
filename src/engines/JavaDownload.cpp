@@ -205,7 +205,7 @@ int JavaDownload::acceptable(QString uri, bool, const EngineEntry* e) {
                               .arg(QString::fromStdString(en.name))
                               .arg(e.what()));
     }
-  } else if (en.regexp.exactMatch(uri))
+  } else if (en.regexp.match(uri).hasMatch())
     return 3;
 
   return 0;
@@ -385,8 +385,7 @@ bool JavaDownloadOptsForm::accept() {
   QString newUrl = lineURL->text();
 
   if (newUrl != m_download->m_strOriginal) {
-    if (!JavaDownload::m_engines[m_download->m_strClass].regexp.exactMatch(
-            newUrl)) {
+    if (!JavaDownload::m_engines[m_download->m_strClass].regexp.match(newUrl).hasMatch()) {
       QMessageBox::warning(getMainWindow(), "FatRat", tr("Invalid URL."));
       return false;
     }

@@ -29,6 +29,7 @@ respects for all of the code used other than "OpenSSL".
 #include <QFileDialog>
 #include <QSettings>
 #include <QtDebug>
+#include <QRegularExpression>
 
 #include "Queue.h"
 #include "RssDownloadedDlg.h"

@@ -72,7 +72,7 @@ BalloonTip::BalloonTip(QWidget *parent, QIcon si, const QString &title,
     QLabel *iconLabel = new QLabel;
     iconLabel->setPixmap(si.pixmap(iconSize, iconSize));
     iconLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    iconLabel->setContentsMargin(2,2,2,2);
+    iconLabel->setContentsMargins(2,2,2,2);
     layout->addWidget(iconLabel, 0, 0);
     layout->addWidget(titleLabel, 0, 1);
   } else {
@@ -82,7 +82,7 @@ BalloonTip::BalloonTip(QWidget *parent, QIcon si, const QString &title,
   layout->addWidget(closeButton, 0, 2);
   layout->addWidget(msgLabel, 1, 0, 1, 3);
   layout->setSizeConstraint(QLayout::SetFixedSize);
-  layout->setContentsMargin(3,3,3,3);
+  layout->setContentsMargins(3,3,3,3);
   setLayout(layout);
 
   QPalette pal = palette();

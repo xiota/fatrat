@@ -27,6 +27,7 @@ respects for all of the code used other than "OpenSSL".
 #include "HttpFtpSettings.h"
 
 #include <QMessageBox>
+#include <QRegularExpression>
 
 #include "Settings.h"
 #include "UserAuthDlg.h"
