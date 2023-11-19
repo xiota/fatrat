@@ -500,7 +500,7 @@ void TorrentDownload::downloadTorrent(QString source)
 {
 	qDebug() << "downloadTorrent()";
 
-	QUuid webseed = getSettingsValue("torrent/proxy_webseed").toString();
+	QUuid webseed = QUuid::fromString(getSettingsValue("torrent/proxy_webseed").toString());
 	Proxy pr = Proxy::getProxy(webseed);
 	
 	m_pFileDownload = new QNetworkAccessManager(this);
