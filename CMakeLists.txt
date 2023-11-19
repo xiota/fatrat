@@ -93,9 +93,9 @@ if(WITH_BITTORRENT)
 	#else(ASIO_FOUND)
 	#	message(FATAL_ERROR "No Boost asio")
 	#endif(ASIO_FOUND)
-	
-	find_package(Qt6WebEngineCore)
-	find_package(Qt6WebEngineWidgets)
+
+	find_package(Qt6 REQUIRED COMPONENTS WebEngineCore)
+	find_package(Qt6 REQUIRED COMPONENTS Qt6WebEngineWidgets)
 
 	if (Qt6WebEngine_FOUND)
 		set(HAVE_WEBENGINE TRUE)
