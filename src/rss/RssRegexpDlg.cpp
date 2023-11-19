@@ -184,7 +184,8 @@ int RssRegexpDlg::exec() {
 
   if ((r = QDialog::exec()) == QDialog::Accepted) {
     m_regexp.regexp =
-        QRegularExpression(lineExpression->text(), Qt::CaseInsensitive);
+        QRegularExpression(lineExpression->text());
+    m_regexp.regexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
     m_regexp.target = lineTarget->text();
 
     m_regexp.queueUUID =
@@ -208,8 +209,8 @@ int RssRegexpDlg::exec() {
     m_regexp.includeTrailers = checkTVSTrailers->isChecked();
     m_regexp.excludeManuals = checkTVSNoManuals->isChecked();
     m_regexp.addPaused = checkAddPaused->isChecked();
-    m_regexp.linkRegexp =
-        QRegularExpression(lineParsingRegexp->text(), Qt::CaseInsensitive);
+    m_regexp.linkRegexp = QRegularExpression(lineParsingRegexp->text());
+    m_regexp.linkRegexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   }
 
   return r;
@@ -232,7 +233,8 @@ void RssRegexpDlg::browse() {
 }
 
 void RssRegexpDlg::test() {
-  QRegularExpression r(lineExpression->text(), Qt::CaseInsensitive);
+  QRegularExpression r(lineExpression->text());
+  r.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
   QRegularExpressionMatch match = r.match(lineText->text());
   labelMatch->setPixmap(match.hasMatch() ? QPixmap(":/states/completed.png")
                                          : QPixmap(":/menu/delete.png"));
