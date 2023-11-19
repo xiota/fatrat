@@ -19,13 +19,14 @@ INCLUDE(FindBoost)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt6Core REQUIRED)
-find_package(Qt6Widgets REQUIRED)
-find_package(Qt6Svg REQUIRED)
-find_package(Qt6DBus REQUIRED)
-find_package(Qt6Network REQUIRED)
-find_package(Qt6Xml REQUIRED)
-find_package(Qt6LinguistTools REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
+find_package(Qt6 REQUIRED COMPONENTS DBus)
+find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Network)
+find_package(Qt6 REQUIRED COMPONENTS Svg)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Xml)
 
 message(STATUS "XML: ${Qt6Xml_INCLUDE_DIRS}")
 include_directories(${Qt6Widgets_INCLUDE_DIRS} ${Qt6Xml_INCLUDE_DIRS}
@@ -569,10 +570,10 @@ if (POSIX_LINUX)
 endif (POSIX_LINUX)
 
 target_link_libraries(fatrat ${DL_LDFLAGS} -lpthread ${QT_LIBRARIES}
-	Qt6::Widgets Qt6::Svg Qt6::Network Qt6::DBus Qt6::Xml
+	Qt6::Core5Compat Qt6::Widgets Qt6::Svg Qt6::Network Qt6::DBus Qt6::Xml
 	LibtorrentRasterbar::torrent-rasterbar ${gloox_LDFLAGS} ${curl_LDFLAGS} ${Boost_LIBRARIES}
 	${Poco_LIBRARIES} ${XATTR_LIBRARIES} crypto -export-dynamic)
-target_link_libraries(fatrat-conf Qt6::Core)
+target_link_libraries(fatrat-conf Qt6::Core Qt6::Core5Compat)
 
 set(fatrat_DEV_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/fatrat.h
