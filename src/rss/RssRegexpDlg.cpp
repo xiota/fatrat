@@ -244,5 +244,6 @@ void RssRegexpDlg::browse()
 void RssRegexpDlg::test()
 {
 	QRegularExpression r(lineExpression->text(), Qt::CaseInsensitive);
-	labelMatch->setPixmap( (r.indexIn(lineText->text()) != -1) ? QPixmap(":/states/completed.png") : QPixmap(":/menu/delete.png") );
+	QRegularExpressionMatch match = r.match(lineText->text());
+	labelMatch->setPixmap( match.hasMatch() ? QPixmap(":/states/completed.png") : QPixmap(":/menu/delete.png") );
 }

@@ -158,14 +158,14 @@ void TorrentDownload::fillSettings(libtorrent::settings_pack& settings)
 	short s1 = 0, s2 = 0, s3 = 0, s4 = 0;
 	QRegularExpression reVersion("(\\d)\\.(\\d)\\.(\\d)\\.?(\\d)?");
 
-	if(reVersion.indexIn(ua) != -1)
+	QRegularExpressionMatch match = reVersion.match(ua);
+	if(match.hasMatch())
 	{
-		QStringList caps = reVersion.capturedTexts();
-		s1 = caps[1].toShort();
-		s2 = caps[2].toShort();
-		s3 = caps[3].toShort();
-		if(caps.size() >= 5)
-			s4 = caps[4].toShort();
+		s1 = match.captured(1).toShort();
+		s2 = match.captured(2).toShort();
+		s3 = match.captured(3).toShort();
+		if(match.lastCapturedIndex() >= 4)
+			s4 = match.captured(4).toShort();
 	}
 
 	std::string fingerprint = libtorrent::generate_fingerprint("FR", s1, s2, s3, s4);

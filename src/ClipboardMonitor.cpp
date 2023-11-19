@@ -75,10 +75,12 @@ void ClipboardMonitor::dataChanged(QClipboard::Mode mode)
 	{
 		int pos = 0, start = links.size();
 
-		while ( (pos = re.indexIn(text, pos)) != -1)
-		{
-			links << re.cap(0);
-			pos += re.cap(0).length();
+		QRegularExpressionMatch match = re.match(text, pos);
+
+		while(match.hasMatch()) {
+			links << match.captured(0);
+			pos = match.capturedEnd(0);
+			match = re.match(text, pos);
 		}
 
 		for (int i=start;i<links.size();i++)

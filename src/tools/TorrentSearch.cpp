@@ -323,12 +323,12 @@ void TorrentSearch::parseResults(Engine* e, const QByteArray& data)
 
 				for(int k=0;k<it.value().match+1;k++)
 				{
-					pos = re.indexIn(ar, pos);
+					QRegularExpressionMatch match = re.match(ar, pos);
 
-					if(pos < 0)
+					if(!match.hasMatch())
 						throw RuntimeException(QString("Failed to match \"%1\" in \"%2\"").arg(it.key()).arg(QString(ar)));
 					else
-						pos++; // FIXME
+						pos = match.capturedEnd(0); // Move to the end of the match
 				}
 
 				QString text;
