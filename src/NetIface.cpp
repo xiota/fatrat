@@ -26,6 +26,7 @@ respects for all of the code used other than "OpenSSL".
 
 #include "NetIface.h"
 #include <QFile>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QtDebug>
 
