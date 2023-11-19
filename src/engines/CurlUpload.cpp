@@ -157,7 +157,7 @@ void CurlUpload::changeActive(bool nowActive) {
 
     if (m_mode == FtpActive) curl_easy_setopt(m_curl, CURLOPT_FTPPORT, "-");
 
-    Proxy proxy = QUuid::fromString(Proxy::getProxy(m_proxy));
+    Proxy proxy = Proxy::getProxy(m_proxy);
     if (proxy.nType != Proxy::ProxyNone) {
       QByteArray p;
 

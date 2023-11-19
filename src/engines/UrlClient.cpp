@@ -248,7 +248,10 @@ void UrlClient::processContentDisposition(const QByteArray& con) {
     QString name = con.mid(pos + 9);
 
     QRegularExpression quoted("\"([^\"]+)\".*");
-    if (quoted.match(name).hasMatch()) name = quoted.cap(1);
+
+    QRegularExpressionMatch = quoted.match(name);
+    if (match.hasMatch())
+      name = match.captured(1);
 
     name.replace('/', '_');
     qDebug() << "Automatically renaming to" << name;

@@ -306,12 +306,13 @@ void TorrentSearch::parseResults(Engine* e, const QByteArray& data) {
         }
 
         QString text;
+        QRegularExpressionMatch match = re.match(name);
         if (e->formats.contains(it.key())) {
           text = e->formats[it.key()];
-          for (int i = 0; i < re.captureCount(); i++)
-            text = text.arg(re.cap(i + 1));
+          for (int i = 0; i < match.captureCount(); i++)
+            text = text.arg(match.captured(i + 1));
         } else {
-          text = re.cap(it.value().field + 1);
+          text = match.captured(it.value().field + 1);
         }
 
         QTextDocument doc;  // FIXME: ineffective?

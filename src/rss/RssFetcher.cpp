@@ -366,33 +366,37 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match,
         matcher2("(\\d\\d)[\\-\\. ](\\d\\d)[\\-\\. ](\\d{2,4})"),
         matcher3("(\\d\\d?)[\\-\\. ](\\w{3,})[\\-\\. ](\\d{2,4})");
 
-    if (matcher1.match(itemName).hasMatch()) {
-      int month = matcher1.cap(2).toInt(), day = matcher1.cap(3).toInt();
+    QRegularExpression matched1 = matcher1.match(itemName);
+    QRegularExpression matched2 = matcher2.match(itemName);
+    QRegularExpression matched3 = matcher3.match(itemName);
+
+    if (matched1.hasMatch()) {
+      int month = matched1.captured(2).toInt(), day = matched1.captured(3).toInt();
       dayMonthHeuristics(day, month);
       rval = QString("%1-%2-%3")
-                 .arg(matcher1.cap(1).toInt())
+                 .arg(matched1.captured(1).toInt())
                  .arg(month, 2, 10, zero)
                  .arg(day, 2, 10, zero);
-    } else if (matcher2.match(itemName).hasMatch()) {
-      int year = matcher2.cap(3).toInt();
+    } else if (matched2.hasMatch()) {
+      int year = matched2.captured(3).toInt();
       if (year < 100) year += 2000;
-      int day = matcher2.cap(1).toInt();
-      int month = matcher2.cap(2).toInt();
+      int day = matched2.captured(1).toInt();
+      int month = matched2.captured(2).toInt();
 
       dayMonthHeuristics(day, month);
       rval = QString("%1-%2-%3")
                  .arg(year)
                  .arg(month, 2, 10, zero)
                  .arg(day, 2, 10, zero);
-    } else if (matcher3.match(itemName).hasMatch()) {
+    } else if (matched3.hasMatch()) {
       const char* months[] = {"January",   "February", "March",    "April",
                               "May",       "June",     "July",     "August",
                               "September", "October",  "November", "December"};
       int month = 0;
-      int year = matcher3.cap(3).toInt();
+      int year = matched3.captured(3).toInt();
       if (year < 100) year += 2000;
 
-      QString m = matcher3.cap(2);
+      QString m = matched3.captured(2);
       for (int i = 0; i < 12; i++) {
         QString sshort = months[i];
         sshort.resize(3);
@@ -407,8 +411,8 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match,
       if (month) {
         rval = QString("%1-%2-%3")
                    .arg(year)
-                   .arg(month, 2, 10, zero)
-                   .arg(matcher3.cap(1).toInt(), 2, 10, zero);
+                   .arg(month, 2,10, zero)
+                   .arg(matched3.captured(1).toInt(), 2, 10, zero);
       }
     }
   }

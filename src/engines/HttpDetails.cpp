@@ -398,10 +398,11 @@ QMap<QString, QStringList> HttpDetails::loadMirrors() {
     QString line = file.readLine().trimmed();
     if (line.isEmpty()) continue;
 
-    if (re.match(line).hasMatch()) {
+    QRegularExpressionMatch match = re.match(line);
+    if (match.hasMatch()) {
       if (!nextGrp.isEmpty()) rv[nextGrp] = list;
       list.clear();
-      nextGrp = re.cap(1);
+      nextGrp = match.captured(1);
     } else
       list << line;
   }
