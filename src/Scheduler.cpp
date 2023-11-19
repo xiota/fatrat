@@ -57,7 +57,7 @@ void Scheduler::loadActions(QList<ScheduledAction>& list)
 		ScheduledAction a;
 		g_settings->setArrayIndex(i);
 		a.name = g_settings->value("name").toString();
-		a.queue = g_settings->value("queueUUID").toString();
+		a.queue = QUuid::fromString(g_settings->value("queueUUID").toString());
 		a.action = (ScheduledAction::ActionType) g_settings->value("action").toInt();
 		a.whenOneTime = QDateTime::fromString(g_settings->value("whenOneTime").toString(), Qt::ISODate);
 		a.whenRepeated = QTime::fromString(g_settings->value("whenRepeated").toString(), Qt::ISODate);
