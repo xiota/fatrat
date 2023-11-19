@@ -47,7 +47,6 @@ void BaseToolTip::mousePressEvent(QMouseEvent*) { hide(); }
 void BaseToolTip::placeMe()  // from Qt
 {
   QPoint pos = QCursor::pos();
-  int s = QGuiApplication::primaryScreen()->screenNumber(pos);
   QRect screen = QGuiApplication::primaryScreen()->geometry();
 
   QPoint p = pos;

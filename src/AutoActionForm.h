@@ -28,6 +28,7 @@ respects for all of the code used other than "OpenSSL".
 #define AUTOACTIONFORM_H
 
 #include "ui_AutoActionForm.h"
+#include "WidgetHostChild.h"
 
 class AutoActionForm : public WidgetHostChild, Ui_AutoActionForm {
  public:
