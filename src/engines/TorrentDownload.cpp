@@ -260,7 +260,7 @@ void TorrentDownload::fillSettings(libtorrent::settings_pack& settings) {
   // Proxy settings
 
   const Proxy proxy =
-      Proxy::getProxy(getSettingsValue("torrent/proxy").toString());
+      Proxy::getProxy(QUuid::fromString(getSettingsValue("torrent/proxy").toString()));
 
   if (proxy.nType != Proxy::ProxyNone) {
     settings.set_str(libtorrent::settings_pack::proxy_hostname,
