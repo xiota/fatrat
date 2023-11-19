@@ -326,8 +326,8 @@ void QueueMgr::unpauseAllTransfers()
 		{
 			Transfer* t = q->at(i);
 			QUuid uuid = QUuid::fromString(t->uuid());
-			if (m_paused.contains(uuid.toString()) && t->state() == Transfer::Paused)
-				t->setState(m_paused[uuid.toString()]);
+			if (m_paused.contains(uuid) && t->state() == Transfer::Paused)
+				t->setState(m_paused[uuid]);
 		}
 
 		q->unlock();
