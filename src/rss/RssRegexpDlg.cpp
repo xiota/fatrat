@@ -27,9 +27,9 @@ respects for all of the code used other than "OpenSSL".
 #include "RssRegexpDlg.h"
 
 #include <QFileDialog>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QtDebug>
-#include <QRegularExpression>
 
 #include "Queue.h"
 #include "RssDownloadedDlg.h"
@@ -183,9 +183,9 @@ int RssRegexpDlg::exec() {
   updateParsing();
 
   if ((r = QDialog::exec()) == QDialog::Accepted) {
-    m_regexp.regexp =
-        QRegularExpression(lineExpression->text());
-    m_regexp.regexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+    m_regexp.regexp = QRegularExpression(lineExpression->text());
+    m_regexp.regexp.setPatternOptions(
+        QRegularExpression::CaseInsensitiveOption);
     m_regexp.target = lineTarget->text();
 
     m_regexp.queueUUID =
@@ -210,7 +210,8 @@ int RssRegexpDlg::exec() {
     m_regexp.excludeManuals = checkTVSNoManuals->isChecked();
     m_regexp.addPaused = checkAddPaused->isChecked();
     m_regexp.linkRegexp = QRegularExpression(lineParsingRegexp->text());
-    m_regexp.linkRegexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+    m_regexp.linkRegexp.setPatternOptions(
+        QRegularExpression::CaseInsensitiveOption);
   }
 
   return r;

@@ -66,10 +66,10 @@ respects for all of the code used other than "OpenSSL".
 #include "util/BalloonTip.h"
 
 #ifdef WITH_JPLUGINS
+#include "ExtensionMgr.h"
 #include "engines/JavaAccountStatusWidget.h"
 #include "engines/SettingsJavaPluginForm.h"
 #include "java/JVM.h"
-#include "ExtensionMgr.h"
 #endif
 
 #ifdef WITH_DOCUMENTATION

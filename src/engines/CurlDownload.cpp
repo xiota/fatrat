@@ -109,7 +109,8 @@ void CurlDownload::init(QString uri, QString dest) {
     }
   }
 
-  obj.proxy = QUuid::fromString(getSettingsValue("httpftp/defaultproxy").toString());
+  obj.proxy =
+      QUuid::fromString(getSettingsValue("httpftp/defaultproxy").toString());
   obj.ftpMode = UrlClient::FtpPassive;
 
   m_dir.setPath(dest);

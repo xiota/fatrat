@@ -385,7 +385,9 @@ bool JavaDownloadOptsForm::accept() {
   QString newUrl = lineURL->text();
 
   if (newUrl != m_download->m_strOriginal) {
-    if (!JavaDownload::m_engines[m_download->m_strClass].regexp.match(newUrl).hasMatch()) {
+    if (!JavaDownload::m_engines[m_download->m_strClass]
+             .regexp.match(newUrl)
+             .hasMatch()) {
       QMessageBox::warning(getMainWindow(), "FatRat", tr("Invalid URL."));
       return false;
     }

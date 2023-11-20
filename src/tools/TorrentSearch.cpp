@@ -95,8 +95,8 @@ TorrentSearch::TorrentSearch() : m_bSearching(false) {
 
   QTimer::singleShot(100, this, SLOT(setSearchFocus()));
   m_network = new QNetworkAccessManager(this);
-  m_network->setProxy(
-      Proxy::getProxy(QUuid::fromString(g_settings->value("torrent/proxy_tracker").toString())));
+  m_network->setProxy(Proxy::getProxy(QUuid::fromString(
+      g_settings->value("torrent/proxy_tracker").toString())));
   connect(m_network, SIGNAL(finished(QNetworkReply*)), this,
           SLOT(searchDone(QNetworkReply*)));
 }
@@ -311,7 +311,7 @@ void TorrentSearch::parseResults(Engine* e, const QByteArray& data) {
           text = e->formats[it.key()];
           for (int i = 0; i < re.captureCount(); i++)
             text = text.arg(match.captured(i + 1));
-          } else {
+        } else {
           text = match.captured(it.value().field + 1);
         }
 

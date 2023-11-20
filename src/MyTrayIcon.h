@@ -26,8 +26,8 @@ respects for all of the code used other than "OpenSSL".
 
 #ifndef MYTRAYICON_H
 #define MYTRAYICON_H
-#include <QtDebug>
 #include <QEvent>
+#include <QtDebug>
 #include <cstdlib>
 
 #include "tooltips/TrayToolTip.h"

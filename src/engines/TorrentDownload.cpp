@@ -70,8 +70,8 @@ respects for all of the code used other than "OpenSSL".
 
 #ifdef WITH_WEBINTERFACE
 #define XMLRPCSERVICE_AVOID_SHA_CONFLICT
-#include "remote/XmlRpcService.h"
 #include "Queue.h"
+#include "remote/XmlRpcService.h"
 
 extern QReadWriteLock g_queuesLock;
 #endif
@@ -259,8 +259,8 @@ void TorrentDownload::fillSettings(libtorrent::settings_pack& settings) {
 
   // Proxy settings
 
-  const Proxy proxy =
-      Proxy::getProxy(QUuid::fromString(getSettingsValue("torrent/proxy").toString()));
+  const Proxy proxy = Proxy::getProxy(
+      QUuid::fromString(getSettingsValue("torrent/proxy").toString()));
 
   if (proxy.nType != Proxy::ProxyNone) {
     settings.set_str(libtorrent::settings_pack::proxy_hostname,

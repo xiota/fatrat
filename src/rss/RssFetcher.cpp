@@ -31,11 +31,11 @@ respects for all of the code used other than "OpenSSL".
 #include <QList>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QUrl>
 #include <QXmlSimpleReader>
 #include <QtDebug>
-#include <QRegularExpression>
 
 #include "Logger.h"
 #include "Queue.h"
@@ -269,10 +269,10 @@ void RssFetcher::loadRegexps(QList<RssRegexp>& items) {
     item.queueIndex = -1;
     item.addPaused = g_settings->value("addPaused").toBool();
 
-    item.linkRegexp = QRegularExpression(
-        g_settings->value("linkRegexp").toString());
-    item.linkRegexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
-
+    item.linkRegexp =
+        QRegularExpression(g_settings->value("linkRegexp").toString());
+    item.linkRegexp.setPatternOptions(
+        QRegularExpression::CaseInsensitiveOption);
 
     items << item;
   }
@@ -375,7 +375,8 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match,
     QRegularExpressionMatch matched3 = matcher3.match(itemName);
 
     if (matched1.hasMatch()) {
-      int month = matched1.captured(2).toInt(), day = matched1.captured(3).toInt();
+      int month = matched1.captured(2).toInt(),
+          day = matched1.captured(3).toInt();
       dayMonthHeuristics(day, month);
       rval = QString("%1-%2-%3")
                  .arg(matched1.captured(1).toInt())
@@ -415,7 +416,7 @@ QString RssFetcher::generateEpisodeName(const RssRegexp& match,
       if (month) {
         rval = QString("%1-%2-%3")
                    .arg(year)
-                   .arg(month, 2,10, zero)
+                   .arg(month, 2, 10, zero)
                    .arg(matched3.captured(1).toInt(), 2, 10, zero);
       }
     }
