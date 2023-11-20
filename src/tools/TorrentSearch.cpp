@@ -96,7 +96,7 @@ TorrentSearch::TorrentSearch() : m_bSearching(false) {
   QTimer::singleShot(100, this, SLOT(setSearchFocus()));
   m_network = new QNetworkAccessManager(this);
   m_network->setProxy(
-      Proxy::getProxy(g_settings->value("torrent/proxy_tracker").toString()));
+      Proxy::getProxy(QUuid::fromString(g_settings->value("torrent/proxy_tracker").toString())));
   connect(m_network, SIGNAL(finished(QNetworkReply*)), this,
           SLOT(searchDone(QNetworkReply*)));
 }
@@ -267,12 +267,12 @@ void TorrentSearch::parseResults(Engine* e, const QByteArray& data) {
   try {
     int end, start;
 
-    start = data.indexOf(e->beginning);
+    start = data.indexOf(e->beginning.toUtf8());
     if (start < 0)
       throw RuntimeException(
           "Error parsing search engine's response - 'start'");
 
-    end = data.indexOf(e->ending, start);
+    end = data.indexOf(e->ending.toUtf8(), start);
     if (end < 0)
       throw RuntimeException("Error parsing search engine's response - 'end'");
 
@@ -294,8 +294,9 @@ void TorrentSearch::parseResults(Engine* e, const QByteArray& data) {
         QRegularExpression re(it.value().regexp);
         int pos = 0;
 
+        QRegularExpressionMatch match;
         for (int k = 0; k < it.value().match + 1; k++) {
-          QRegularExpressionMatch match = re.match(ar, pos);
+          match = re.match(ar, pos);
 
           if (!match.hasMatch())
             throw RuntimeException(QString("Failed to match \"%1\" in \"%2\"")
@@ -306,12 +307,11 @@ void TorrentSearch::parseResults(Engine* e, const QByteArray& data) {
         }
 
         QString text;
-        QRegularExpressionMatch match = re.match(name);
         if (e->formats.contains(it.key())) {
           text = e->formats[it.key()];
-          for (int i = 0; i < match.captureCount(); i++)
+          for (int i = 0; i < re.captureCount(); i++)
             text = text.arg(match.captured(i + 1));
-        } else {
+          } else {
           text = match.captured(it.value().field + 1);
         }
 
@@ -407,7 +407,7 @@ QList<QByteArray> TorrentSearch::splitArray(const QByteArray& src,
   int n, split = 0;
   QList<QByteArray> out;
 
-  while ((n = src.indexOf(sep, split)) != -1) {
+  while ((n = src.indexOf(sep.toUtf8(), split)) != -1) {
     out << src.mid(split, n - split);
     split = n + sep.size();
   }
