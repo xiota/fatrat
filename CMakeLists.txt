@@ -647,11 +647,16 @@ if(WITH_JPLUGINS)
 endif(WITH_JPLUGINS)
 
 if(WITH_DOCUMENTATION)
-	execute_process(COMMAND qhelpgenerator
-	${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhcp -o
-	${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhc)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhc DESTINATION share/fatrat/doc)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qch DESTINATION share/fatrat/doc)
+	find_program(QHELPGENERATOR_EXECUTABLE NAMES qhelpgenerator)
+	if(QHELPGENERATOR_EXECUTABLE)
+		execute_process(COMMAND ${QHELPGENERATOR_EXECUTABLE}
+		"${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhcp" -o
+		"${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhc")
+		install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qch DESTINATION share/fatrat/doc)
+		install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhc DESTINATION share/fatrat/doc)
+	else()
+		 message(WARNING "qhelpgenerator not found.  Documentation not generated.")
+	endif()
 endif(WITH_DOCUMENTATION)
 
 install(FILES doc/fatrat.1 DESTINATION share/man/man1)
