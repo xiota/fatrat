@@ -16,6 +16,7 @@ INCLUDE(FindBoost)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 find_package(Qt6 REQUIRED COMPONENTS DBus)
 find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
 find_package(Qt6 REQUIRED COMPONENTS Network)
@@ -563,10 +564,10 @@ if (POSIX_LINUX)
 endif (POSIX_LINUX)
 
 target_link_libraries(fatrat ${DL_LDFLAGS} -lpthread ${QT_LIBRARIES}
-	Qt6::Widgets Qt6::Svg Qt6::Network Qt6::DBus Qt6::Xml
+	Qt6::Core5Compat Qt6::Widgets Qt6::Svg Qt6::Network Qt6::DBus Qt6::Xml
 	LibtorrentRasterbar::torrent-rasterbar ${gloox_LDFLAGS} ${curl_LDFLAGS} ${Boost_LIBRARIES}
 	${Poco_LIBRARIES} ${XATTR_LIBRARIES} crypto)
-target_link_libraries(fatrat-conf Qt6::Core)
+target_link_libraries(fatrat-conf Qt6::Core Qt6::Core5Compat)
 
 set(fatrat_DEV_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/fatrat.h
