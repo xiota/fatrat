@@ -42,7 +42,6 @@ respects for all of the code used other than "OpenSSL".
 #include <QMap>
 #include <QMessageBox>
 #include <QSettings>
-#include <QTextCodec>
 #include <QTranslator>
 #include <QVariant>
 #include <QtDebug>

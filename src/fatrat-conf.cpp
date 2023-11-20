@@ -1,6 +1,5 @@
 #include <QCoreApplication>
 #include <QSettings>
-#include <QTextCodec>
 #include <cstring>
 #include <iostream>
 
