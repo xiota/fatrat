@@ -647,7 +647,7 @@ if(WITH_JPLUGINS)
 endif(WITH_JPLUGINS)
 
 if(WITH_DOCUMENTATION)
-	execute_process(COMMAND qcollectiongenerator
+	execute_process(COMMAND qhelpgenerator
 	${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhcp -o
 	${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhc)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/fatrat.qhc DESTINATION share/fatrat/doc)
